@@ -65,6 +65,52 @@ test %>%
   mutate(midnight = case_when(occurredhour %in% c(23, 0, 1) ~ "yes",
                               occurredhour %in% c(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22) ~ "no")) %>%
   count(midnight)
+
+
+tmp <- incidents %>%
+  unite(EmployeeID, c("company", "EmployeeNumber"), remove = FALSE) %>%
+  filter(company == 'TDNSW') %>%
+  select(ClaimNumber, EmployeeID,TypeOfClaimName,DateOccurred) %>%
+  mutate(JoinDate = as.Date(DateOccurred)) %>%
+  left_join(nswshifts %>%
+              mutate(JoinDate = as.Date(VdsTripStartTime)),
+            by = c("EmployeeID","JoinDate")) %>%
+  mutate(match_type = case_when(
+    is.na(VdsTripStartTime) ~ 0,
+    DateOccurred >= VdsTripStartTime & DateOccurred <= VdsTripEndTime ~ 2,
+    TRUE ~ 1
+  ))
+matched <-
+  tmp %>%
+  inner_join(
+    tmp %>% group_by(ClaimNumber) %>% summarise(match_type = max(match_type)),
+    by = c("ClaimNumber", "match_type")
+  ) %>%
+  arrange(match_type,ClaimNumber,VdsTripStartTime)
+
+tmp2 <- incidents %>%
+  unite(EmployeeID, c("company", "EmployeeNumber"), remove = FALSE) %>%
+  filter(company == 'TDNSW') %>%
+  select(ClaimNumber, EmployeeID,TypeOfClaimName,DateOccurred) %>%
+  mutate(JoinDate = as.Date(DateOccurred)) %>%
+  left_join(nswshifts %>%
+              mutate(JoinDate = as.Date(VdsTripStartTime)) %>%
+              group_by(EmployeeID, JoinDate) %>%
+              summarise(shift_start = min(VdsTripStartTime)-30*60,
+                        shift_end = max(VdsTripEndTime)+30*60),
+            by = c("EmployeeID","JoinDate")) %>%
+  mutate(match_type = case_when(
+    is.na(shift_start) ~ 0,
+    DateOccurred >= shift_start & DateOccurred <= shift_end ~ 2,
+    TRUE ~ 1
+  ))
+matched <-
+  tmp2 %>%
+  inner_join(
+    tmp2 %>% group_by(ClaimNumber) %>% summarise(match_type = max(match_type)),
+    by = c("ClaimNumber", "match_type")
+  ) %>%
+  arrange(match_type,ClaimNumber,shift_start)
 ```
 
 ```{r}

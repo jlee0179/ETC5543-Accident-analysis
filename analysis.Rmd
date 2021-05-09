@@ -34,41 +34,10 @@ incidents <- incidents %>%
 ```{r}
 nswshifts$VdsCompany <- toupper(nswshifts$VdsCompany)
 nswshifts <- nswshifts %>%
-  unite(EmployeeID, c("VdsCompany", "VdsEmployeeId"), remove = FALSE) 
-
-library(data.table)
-setDT(incidents)
-setDT(nswshifts)
-rhs_join <- incidents[nswshifts, 
-                .(i.EmployeeID, x.DateOccurred, i.VdsTripStartTime, 
-                  i.VdsTripEndTime),
-                on = .(EmployeeID = EmployeeID, DateOccurred >= VdsTripStartTime,
-                       DateOccurred <= VdsTripEndTime)][,.(EmployeeID = i.EmployeeID, DateOccurred = x.DateOccurred,
-    VdsTripStartTime = i.VdsTripStartTime,
-    VdsTripEndTime = i.VdsTripEndTime)]
-
-lhs_join <- nswshifts[incidents, 
-                .(i.EmployeeID, DateOccurred, x.VdsTripStartTime,
-                  x.VdsTripEndTime),
-                on = .(EmployeeID = EmployeeID, VdsTripStartTime <= DateOccurred,
-                       VdsTripEndTime >= DateOccurred)][,.(EmployeeID = i.EmployeeID, DateOccurred = DateOccurred,
-    VdsTripStartTime = x.VdsTripStartTime,
-    VdsTripEndTime = x.VdsTripEndTime)]
-
-test <- full_join(rhs_join, lhs_join) %>%
-  left_join(incidents, by = c("EmployeeID", "DateOccurred")) %>%
-  left_join(nswshifts, by = c("EmployeeID", "VdsTripStartTime", "VdsTripEndTime")) %>%
-  left_join(driver_info, by = "EmployeeID")
-
-test %>%
-  mutate(occurredhour = hour(test$DateOccurred)) %>%
-  mutate(midnight = case_when(occurredhour %in% c(23, 0, 1) ~ "yes",
-                              occurredhour %in% c(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22) ~ "no")) %>%
-  count(midnight)
+  unite(EmployeeID, c("VdsCompany", "VdsEmployeeId"), remove = FALSE)
 
 
 tmp <- incidents %>%
-  unite(EmployeeID, c("company", "EmployeeNumber"), remove = FALSE) %>%
   filter(company == 'TDNSW') %>%
   select(ClaimNumber, EmployeeID,TypeOfClaimName,DateOccurred) %>%
   mutate(JoinDate = as.Date(DateOccurred)) %>%
@@ -89,7 +58,6 @@ matched <-
   arrange(match_type,ClaimNumber,VdsTripStartTime)
 
 tmp2 <- incidents %>%
-  unite(EmployeeID, c("company", "EmployeeNumber"), remove = FALSE) %>%
   filter(company == 'TDNSW') %>%
   select(ClaimNumber, EmployeeID,TypeOfClaimName,DateOccurred) %>%
   mutate(JoinDate = as.Date(DateOccurred)) %>%
@@ -116,8 +84,8 @@ matched <-
 ```{r}
 melbourneweather <- melbourneweather %>%
   slice(-1:-9) %>%
-  select(location, Melbourne, Melbourne_1, Melbourne_5) %>%
-  rename(c(timestamp = location, `Melbourne Temperature` = Melbourne, `Melbourne Precipitation Total` = Melbourne_1, `Melbourne Cloud Cover Total` = Melbourne_5)) 
+  select(location, Melbourne, Melbourne_1) %>%
+  rename(c(timestamp = location, `Melbourne Temperature` = Melbourne, `Melbourne Precipitation Total` = Melbourne_1)) 
 melbourneweather <- melbourneweather %>%
         mutate(timestamp = ymd_hm(timestamp))
 
@@ -126,8 +94,15 @@ melbourneweather <- melbourneweather %>%
 ```{r}
 sydneyweather <- sydneyweather %>%
   slice(-1:-9) %>%
-  select(location, Sydney, Sydney_1, Sydney_5) %>%
-  rename(c(timestamp = location, `Sydney Temperature` = Sydney, `Sydney Precipitation Total` = Sydney_1, `Sydney Cloud Cover Total` = Sydney_5)) 
+  select(location, Sydney, Sydney_1) %>%
+  rename(c(timestamp = location, `Sydney Temperature` = Sydney, `Sydney Precipitation Total` = Sydney_1)) 
 sydneyweather <- sydneyweather %>%
         mutate(timestamp = ymd_hm(timestamp))
 ```
+
+### Questions:
+1. How are drivers' characteristics (Depot, gender, employee start date and age) affecting the incidents? Which is contributing the most incidents?
+2. On what day have most incidents been found? Which hours are the peak and trough?
+3. Has daytime or night been a significant cause of incidents?
+4. What kind of weather (temperature and precipitation) is considered safer or dangerous for bus drivers?
+5. Is there a relationship between drivers' driving hours within a day and the likelihood of getting into an incident?

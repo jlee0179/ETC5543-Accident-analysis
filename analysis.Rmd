@@ -114,25 +114,12 @@ matched <-
 ```
 
 ```{r}
-data.frame(t(melbourneweather[,c("lat", "lon", "asl", "variable", "unit", "level", "resolution", "aggregation", "timestamp")]))
-data.frame(t(melbourneweather))
+melbourneweather <- melbourneweather %>%
+  slice(-1:-9) %>%
+  rename(c(timestamp = location, `Melbourne Temperature` = Melbourne, `Melbourne Precipitation Total` = Melbourne_1, 
+           `Melbourne Relative Humidity` = Melbourne_2, `Melbourne Wind Speed` = Melbourne_3, `Melbourne Wind Direction` = Melbourne_4, `Melbourne Cloud Cover Total` = Melbourne_5)) %>%
+  select(timestamp, `Melbourne Temperature`, `Melbourne Precipitation Total`, `Melbourne Cloud Cover Total`)
+melbourneweather <- melbourneweather %>%
+        mutate(timestamp = ymd_hm(timestamp))
 
-transpose(melbourneweather[1:7])
-a <- melbourneweather %>%
-  slice(1:8) 
-as.data.frame(transpose(a, keep.names = "rn"))
-
-as.data.frame(x = t(melbourneweather), stringsAsFactors = FALSE)
-setNames(data.frame(t(melbourneweather[,-1])), melbourneweather[,1])
-
-dcast(melt(melbourneweather, id.vars = "location"), location ~ "Melbourne")
-
-melbourneweather %>%
-  slice(1:8) %>%
-  pivot_wider(id_cols = location, names_from = location, values_from = Melbourne:Melbourne_5)
-
-melbourneweather %>%  
-pivot_longer(names_to = c(Melbourne:Melbourne_5), values_to = location)
-  pivot_wider(names_from = location, values_from = c(Melbourne:Melbourne_5)) %>%
-  pivot_longer(names_to = timestamp, values_to = c(Melbourne_20150101T0000:Melbourne_20210428T2300))
 ```

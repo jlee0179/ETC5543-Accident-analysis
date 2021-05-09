@@ -116,10 +116,18 @@ matched <-
 ```{r}
 melbourneweather <- melbourneweather %>%
   slice(-1:-9) %>%
-  rename(c(timestamp = location, `Melbourne Temperature` = Melbourne, `Melbourne Precipitation Total` = Melbourne_1, 
-           `Melbourne Relative Humidity` = Melbourne_2, `Melbourne Wind Speed` = Melbourne_3, `Melbourne Wind Direction` = Melbourne_4, `Melbourne Cloud Cover Total` = Melbourne_5)) %>%
-  select(timestamp, `Melbourne Temperature`, `Melbourne Precipitation Total`, `Melbourne Cloud Cover Total`)
+  select(location, Melbourne, Melbourne_1, Melbourne_5) %>%
+  rename(c(timestamp = location, `Melbourne Temperature` = Melbourne, `Melbourne Precipitation Total` = Melbourne_1, `Melbourne Cloud Cover Total` = Melbourne_5)) 
 melbourneweather <- melbourneweather %>%
         mutate(timestamp = ymd_hm(timestamp))
 
+```
+
+```{r}
+sydneyweather <- sydneyweather %>%
+  slice(-1:-9) %>%
+  select(location, Sydney, Sydney_1, Sydney_5) %>%
+  rename(c(timestamp = location, `Sydney Temperature` = Sydney, `Sydney Precipitation Total` = Sydney_1, `Sydney Cloud Cover Total` = Sydney_5)) 
+sydneyweather <- sydneyweather %>%
+        mutate(timestamp = ymd_hm(timestamp))
 ```

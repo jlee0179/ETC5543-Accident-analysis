@@ -79,6 +79,12 @@ matched <-
     by = c("ClaimNumber", "match_type")
   ) %>%
   arrange(match_type,ClaimNumber,shift_start)
+
+tmp <- tmp %>%
+  mutate(day_of_week = weekdays(as.Date(DateOccurred)))
+
+tmp2 <- tmp2 %>%
+  mutate(day_of_week = weekdays(as.Date(DateOccurred)))
 ```
 
 ```{r}
@@ -102,6 +108,11 @@ sydneyweather <- sydneyweather %>%
 
 ### Questions:
 1. How are drivers' characteristics (Depot, gender, employee start date and age) affecting the incidents? Which is contributing the most incidents?
+
+```{r}
+
+```
+
 2. On what day have most incidents been found? Which hours are the peak and trough?
 3. Has daytime or night been a significant cause of incidents?
 4. What kind of weather (temperature and precipitation) is considered safer or dangerous for bus drivers?

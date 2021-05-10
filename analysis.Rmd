@@ -110,19 +110,10 @@ sydneyweather <- sydneyweather %>%
 1. How are drivers' characteristics (Depot, gender, employee start date and age) affecting the incidents? Which is contributing the most incidents?
 
 ```{r}
-tmp2 %>%
-  left_join(driver_info, by = "EmployeeID") %>%
-  group_by(Depot) %>%
-  summarise(total_cases_num = n()) %>%
-  ggplot(aes(x = Depot, y = total_cases_num)) +
-  geom_bar(stat = "identity", fill = "skyblue") +
-  geom_text(aes(label = total_cases_num)) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(y = "Total claim number", title = "Total claim by depot")
-  
 incidents %>%
-  left_join(driver_info, by = "EmployeeID") %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  inner_join(driver_info, by = "EmployeeID") %>%
   group_by(Depot, company) %>%
   summarise(total_cases_num = n()) %>%
   ggplot(aes(x = Depot, y = total_cases_num, fill = company)) +
@@ -134,9 +125,54 @@ incidents %>%
 ```
 
 ```{r}
+incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  inner_join(driver_info, by = "EmployeeID") %>%
+  group_by(Depot, company, ClaimCategoryName) %>%
+  summarise(total_cases_num = n()) %>%
+  ggplot(aes(x = ClaimCategoryName, y = total_cases_num, fill = company)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~Depot) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(y = "Total claim number", title = "Total claim by depot")
+  
 
 ```
+
 2. On what day have most incidents been found? Which hours are the peak and trough?
+
+```{r}
+incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  mutate(day_week = weekdays(as.Date(DateOccurred))) %>%
+  group_by(day_week) %>%
+  summarise(total_cases = n()) %>%
+  ggplot(aes(x = factor(day_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")), total_cases)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  geom_text(aes(label=total_cases), vjust=1.6, color="white", size=3.5)+
+    theme_minimal() +
+  labs(y = "Total claim number", x = "Day", title = "Total claim by day of the week")
+```
+
+```{r}
+incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  mutate(day_week = weekdays(DateOccurred),
+         hour = hour(DateOccurred)) %>%
+  group_by(day_week, hour) %>%
+  summarise(total_cases = n()) %>%
+  ggplot(aes(x = hour, total_cases)) +
+  geom_line(line = "skyblue") +
+  geom_text(aes(label=total_cases), vjust=1.6, color="white", size=3.5) +
+  facet_wrap(~day_week) +
+    theme_minimal() +
+  labs(y = "Total claim number", x = "Day", title = "Total claim by day of the week")
+```
+
 3. Has daytime or night been a significant cause of incidents?
 4. What kind of weather (temperature and precipitation) is considered safer or dangerous for bus drivers?
 5. Is there a relationship between drivers' driving hours within a day and the likelihood of getting into an incident?

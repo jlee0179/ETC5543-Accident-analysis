@@ -136,9 +136,26 @@ incidents %>%
   facet_wrap(~Depot) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(y = "Total claim number", title = "Total claim by depot")
+  labs(y = "Total claim number", title = "Total claim by depot and claim category")
   
 
+```
+
+
+```{r}
+incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  inner_join(driver_info, by = "EmployeeID") %>%
+  group_by(Gender, company) %>%
+  summarise(total_cases_num = n()) %>%
+  ggplot(aes(x = Gender, y = total_cases_num, fill = Gender)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = total_cases_num)) +
+  theme_minimal() +
+  facet_wrap(~company) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(y = "Total claim number", title = "Total claim by gender")
 ```
 
 2. On what day have most incidents been found? Which hours are the peak and trough?
@@ -165,12 +182,12 @@ incidents %>%
          hour = hour(DateOccurred)) %>%
   group_by(day_week, hour) %>%
   summarise(total_cases = n()) %>%
-  ggplot(aes(x = hour, total_cases)) +
-  geom_line(line = "skyblue") +
-  geom_text(aes(label=total_cases), vjust=1.6, color="white", size=3.5) +
-  facet_wrap(~day_week) +
+  ggplot(aes(x = hour, y = total_cases)) +
+  geom_line() +
+  facet_wrap(~factor(day_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) +
     theme_minimal() +
-  labs(y = "Total claim number", x = "Day", title = "Total claim by day of the week")
+  labs(y = "Total claim number", x = "Hour", title = "Total claim by daily hours")
+
 ```
 
 3. Has daytime or night been a significant cause of incidents?

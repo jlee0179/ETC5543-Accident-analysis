@@ -107,7 +107,7 @@ sydneyweather <- sydneyweather %>%
 ```
 
 ### Questions:
-1. How are drivers' characteristics (Depot, gender, employee start date and age) affecting the incidents? Which is contributing the most incidents?
+1. How are drivers' characteristics (Depot, gender and age) affecting the incidents? Which is contributing the most incidents?
 
 ```{r}
 incidents %>%
@@ -156,6 +156,19 @@ incidents %>%
   facet_wrap(~company) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(y = "Total claim number", title = "Total claim by gender")
+```
+
+
+```{r}
+age_incidents <- incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  inner_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears()) 
+age_incidents$driver_age <- round(age_incidents$driver_age, digits = 0)
+
+  
 ```
 
 2. On what day have most incidents been found? Which hours are the peak and trough?

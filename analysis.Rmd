@@ -155,7 +155,7 @@ incidents %>%
   theme_minimal() +
   facet_wrap(~company) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(y = "Total claim number", title = "Total claim by gender")
+  labs(y = "Total claim number", title = "Total claim by gender and State")
 ```
 
 
@@ -167,7 +167,22 @@ age_incidents <- incidents %>%
   mutate(driver_age = today() - dmy(BirthDate),
          driver_age = driver_age/dyears()) 
 age_incidents$driver_age <- round(age_incidents$driver_age, digits = 0)
-
+age_incidents <- age_incidents %>%
+  mutate(age_group = case_when(driver_age >= 21 & driver_age <= 30 ~ "21-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
+age_incidents %>%
+  group_by(age_group) %>%
+  summarise(total_cases_num = n()) %>%
+  ggplot(aes(x = age_group, y = total_cases_num, fill = age_group)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = total_cases_num)) +
+  theme_minimal() +
+  labs(x = "Age group", y = "Total claim number", title = "Total claim by age group", fill = "Age group")
   
 ```
 
@@ -204,5 +219,79 @@ incidents %>%
 ```
 
 3. Has daytime or night been a significant cause of incidents?
+
+```{r}
+daynight_incidents <- incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  mutate(hour = hour(DateOccurred))
+
+daynight_incidents %>%
+  mutate(day_night = case_when(hour >= 19 | hour %in% c(0, 1, 2, 3, 4) ~ "night",
+                               hour < 19 ~ "day")) %>%
+  group_by(day_night) %>%
+  summarise(total_cases = n()) %>%
+  ggplot(aes(x = day_night, y = total_cases, fill = day_night)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label=total_cases), vjust=1.6, color="white", size=3.5) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(x = "Daytime/night", y = "Total claim number")
+```
+
+```{r}
+tmp2 %>%
+  filter(match_type == 2) %>%
+  
+  
+```
+
 4. What kind of weather (temperature and precipitation) is considered safer or dangerous for bus drivers?
+
+```{r}
+dh_incidents <- incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  mutate(date_hour = format(DateOccurred, format = "%Y-%m-%d %H"))
+
+melbourneweather <- melbourneweather %>%
+  mutate(company = "TDM",
+         date_hour = format(timestamp, format = "%Y-%m-%d %H")) %>%
+  rename(Temperature = `Melbourne Temperature`, Precipitation = `Melbourne Precipitation Total`)
+
+sydneyweather <- sydneyweather %>%
+  mutate(company = "TDM",
+         date_hour = format(timestamp, format = "%Y-%m-%d %H")) %>%
+  rename(Temperature = `Sydney Temperature`, Precipitation = `Sydney Precipitation Total`)
+
+mel_syd_weather <- rbind(melbourneweather, sydneyweather)
+
+weather_incidents <- dh_incidents %>%
+  inner_join(mel_syd_weather, by = c("company", "date_hour")) 
+
+weather_incidents %>%
+  mutate(date = format(timestamp, format = "%Y-%m-%d")) %>%
+  group_by(Temperature) %>%
+  summarise(count = n()) 
+
+
+    high_prcp = if_else(condition = Precipitation > 5,
+                          true = "rain",
+                          false = "none"),
+    high_temp = if_else(condition = Temperature > 33,
+                        true = "hot",
+                        false = "not"),
+    low_temp = if_else(condition = Temperature < 6,
+                        true = "cold",
+                        false = "not"))
+
+
+```
+
 5. Is there a relationship between drivers' driving hours within a day and the likelihood of getting into an incident?
+
+```{r}
+tmp2 %>%
+  filter(match_type == 2) %>%
+  mutate(i_driving_hour = )
+```

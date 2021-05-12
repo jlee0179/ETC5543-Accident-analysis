@@ -128,15 +128,35 @@ incidents %>%
 
 ```{r}
 # all drivers in each depot
-incidents %>%
+total_drvr_inc <- incidents %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
   right_join(driver_info, by = "EmployeeID") %>%
+  group_by(Depot, CompanyID, EmployeeID) %>%
+  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) %>%
+  group_by(Depot, CompanyID, driver_incident, EmployeeID) %>%
+  summarise(driver_depot = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
   group_by(Depot, CompanyID) %>%
-  summarise(all_driver_depot = n()) 
+  summarise(num_drv_inc = sum(driver_depot))
 
-  group_by(Depot, company) %>%
-  summarise(total_cases_pct = percent(n() / sum(n())))
+total_drvr_dpt <- driver_info %>%
+  group_by(Depot, CompanyID) %>%
+  summarise(num_of_drvr = n())
+
+total_drvr_inc %>%
+  left_join(total_drvr_dpt, by = c("Depot", "CompanyID")) %>%
+  mutate(has_incident_dpt = (num_drv_inc/num_of_drvr)*100) %>%
+  mutate(across(has_incident_dpt, round, 2)) %>%
+  ggplot(aes(x = Depot, y = has_incident_dpt, fill = CompanyID)) +
+  geom_bar(stat = "identity") + 
+  geom_text(aes(label = has_incident_dpt), vjust=1.6, color="white", size=2.5) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(y = "Drivers having incidents", fill = "Company", title = "Proportion of drivers having incidents by Depot")
+
 
 ```
 

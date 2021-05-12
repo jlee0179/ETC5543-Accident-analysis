@@ -121,7 +121,7 @@ incidents %>%
   geom_bar(stat = "identity") +
   geom_text(aes(label = total_cases_num)) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   labs(y = "Total claim number", title = "Total claim by depot")
 ```
 
@@ -155,7 +155,7 @@ total_drvr_inc %>%
   scale_y_continuous(labels = scales::percent_format(scale = 1)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(y = "Drivers having incidents", fill = "Company", title = "Proportion of drivers having incidents by Depot")
+  labs(y = "Drivers had claims", fill = "Company", title = "Proportion of drivers had claims by Depot")
 
 
 ```

@@ -18,7 +18,8 @@ library(tidyverse)
 ### Data wrangling
 
 ```{r}
-driver_info <- read_csv("data/Driver_Info.csv")
+driver_info <- read_csv("data/Driver_Info.csv") %>%
+  filter(!Depot == "Not Given")
 incidents <- read_csv("data/Incidents.csv")
 nswshifts <- read_csv("data/NSWshifts.csv") %>%
   distinct()
@@ -124,23 +125,22 @@ incidents %>%
   labs(y = "Total claim number", title = "Total claim by depot")
 ```
 
+
 ```{r}
+# all drivers in each depot
 incidents %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
-  inner_join(driver_info, by = "EmployeeID") %>%
-  group_by(Depot, company, ClaimCategoryName) %>%
-  summarise(total_cases_num = n()) %>%
-  ggplot(aes(x = ClaimCategoryName, y = total_cases_num, fill = company)) +
-  geom_bar(stat = "identity") +
-  facet_wrap(~Depot) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(y = "Total claim number", title = "Total claim by depot and claim category")
-  
+  right_join(driver_info, by = "EmployeeID") %>%
+  group_by(Depot, CompanyID) %>%
+  summarise(all_driver_depot = n()) 
+
+  group_by(Depot, company) %>%
+  summarise(total_cases_pct = percent(n() / sum(n())))
 
 ```
 
+### Gender
 
 ```{r}
 incidents %>%
@@ -158,6 +158,7 @@ incidents %>%
   labs(y = "Total claim number", title = "Total claim by gender and State")
 ```
 
+### Age
 
 ```{r}
 age_incidents <- incidents %>%
@@ -295,3 +296,4 @@ tmp2 %>%
   filter(match_type == 2) %>%
   mutate(i_driving_hour = )
 ```
+

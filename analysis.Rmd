@@ -178,6 +178,22 @@ incidents %>%
   labs(y = "Total claim number", title = "Total claim by gender and State")
 ```
 
+```{r}
+incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  group_by(Gender, CompanyID, EmployeeID) %>%
+  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) %>%
+  group_by(Gender, CompanyID, driver_incident, EmployeeID) %>%
+  summarise(driver_gdr = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
+  group_by(Gender, CompanyID) %>%
+  summarise(num_drv_inc = sum(driver_gdr))
+  
+```
+
 ### Age
 
 ```{r}

@@ -196,6 +196,7 @@ total_drvr_gdr <- driver_info %>%
 
 drvr_inc_gdr %>%
   full_join(total_drvr_gdr, by = c("Gender", "CompanyID")) %>%
+  #mutate(num_drv_inc = replace_na(0)) %>%
   mutate(has_incident_gdr = (num_drv_inc/num_of_drvr)*100) %>%
   mutate(across(has_incident_gdr, round, 2)) %>%
   ggplot(aes(x = Gender, y = has_incident_gdr, fill = CompanyID)) +

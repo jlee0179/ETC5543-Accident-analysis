@@ -196,16 +196,17 @@ total_drvr_gdr <- driver_info %>%
 
 drvr_inc_gdr %>%
   full_join(total_drvr_gdr, by = c("Gender", "CompanyID")) %>%
-  #mutate(num_drv_inc = replace_na(0)) %>%
+  mutate(num_drv_inc = replace_na(num_drv_inc, 0)) %>%
   mutate(has_incident_gdr = (num_drv_inc/num_of_drvr)*100) %>%
   mutate(across(has_incident_gdr, round, 2)) %>%
-  ggplot(aes(x = Gender, y = has_incident_gdr, fill = CompanyID)) +
+  ggplot(aes(x = Gender, y = has_incident_gdr, fill = Gender)) +
   geom_bar(stat = "identity") + 
   geom_text(aes(label = has_incident_gdr), vjust=1.6, color="white", size=2.5) +
   scale_y_continuous(labels = scales::percent_format(scale = 1)) +
   theme_minimal() +
+  facet_grid(.~CompanyID) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(y = "Drivers had claims", fill = "Gender", title = "Proportion of drivers had claims by Gender")
+  labs(y = "Drivers had claims", fill = "Gender", title = "Proportion of drivers had claims by Gender and company")
   
 ```
 

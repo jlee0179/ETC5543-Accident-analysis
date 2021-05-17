@@ -540,8 +540,7 @@ daynight_incidents %>%
 dh_incidents <- incidents %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
-  mutate(date_hour = format(DateOccurred, format = "%Y-%m-%d %H"),
-         hour = hour(DateOccurred)) %>%
+  mutate(date_hour = format(DateOccurred, format = "%Y-%m-%d %H")) %>%
   filter(company %in% c("TDNSW", "TDM"))
 
 melbourneweather <- melbourneweather %>%
@@ -557,7 +556,8 @@ sydneyweather <- sydneyweather %>%
 mel_syd_weather <- rbind(melbourneweather, sydneyweather)
 
 weather_n_incidents <- mel_syd_weather %>%
-  full_join(dh_incidents, by = c("company", "date_hour")) %>%
+  mutate(hour = hour(timestamp)) %>%
+  left_join(dh_incidents, by = c("company", "date_hour")) %>%
   mutate(rain = case_when(Precipitation >= 2.5 ~ "Yes",
                           Precipitation < 2.5 ~ "No"),
          has_incident = case_when(is.na(ClaimNumber) ~ "No",
@@ -567,25 +567,25 @@ weather_n_incidents %>%
   filter(rain == "Yes") %>%
   ggplot(aes(x = hour, group = has_incident, fill = has_incident)) +
   geom_density(alpha = 0.5) +
-  facet_grid(~company)
-
-weather_incidents %>%
-  mutate(date = format(timestamp, format = "%Y-%m-%d")) %>%
-  group_by(Temperature) %>%
-  summarise(count = n()) 
-
-
-    high_prcp = if_else(condition = Precipitation > 5,
-                          true = "rain",
-                          false = "none"),
-    high_temp = if_else(condition = Temperature > 33,
-                        true = "hot",
-                        false = "not"),
-    low_temp = if_else(condition = Temperature < 6,
-                        true = "cold",
-                        false = "not"))
+  facet_grid(~company) +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  scale_fill_discrete(labels=c("Non-incident", "Incident")) +
+  labs(x = "Hour of day", title = "Incident and non-incident distribution under rainy condition")
 
 
+```
+
+```{r}
+weather_n_incidents %>%
+  filter(rain == "No") %>%
+  ggplot(aes(x = hour, group = has_incident, fill = has_incident)) +
+  geom_density(alpha = 0.5) +
+  facet_grid(~company) +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  scale_fill_discrete(labels=c("Non-incident", "Incident")) +
+  labs(x = "Hour of day", title = "Incident and non-incident distribution under little/no rain condition")
 ```
 
 5. Is there a relationship between drivers' driving hours within a day and the likelihood of getting into an incident?

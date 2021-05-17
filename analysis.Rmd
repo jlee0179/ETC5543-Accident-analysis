@@ -239,6 +239,61 @@ age_incidents %>%
   
 ```
 
+```{r}
+inc_age <- incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears(),
+         driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes"))
+inc_age$driver_age <- round(inc_age$driver_age, digits = 0)
+inc_age <- inc_age %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
+inc_age <- inc_age %>%
+  group_by(age_group, driver_incident, EmployeeID) %>%
+  summarise(driver_age_group = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
+  group_by(age_group) %>%
+  summarise(num_drv_inc = sum(driver_age_group))
+
+
+drvr_info_age <- driver_info %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears())
+drvr_info_age$driver_age <- round(drvr_info_age$driver_age, digits = 0)
+drvr_info_age <- drvr_info_age %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
+drvr_info_age <- drvr_info_age %>%
+  group_by(age_group) %>%
+  summarise(num_of_drvr = n())
+
+inc_age %>%
+  full_join(drvr_info_age, by = "age_group") %>%
+  mutate(has_incident_age = (num_drv_inc/num_of_drvr)*100) %>%
+  mutate(across(has_incident_age, round, 2)) %>%
+  ggplot(aes(x = age_group, y = has_incident_age, fill = age_group)) +
+  geom_bar(stat = "identity") + 
+  geom_text(aes(label = has_incident_age), vjust=1.6, color="white", size=2.5) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x = "Age group", y = "Drivers had claims", fill = "Age group", title = "Proportion of drivers had claims by Age")
+```
+
 2. On what day have most incidents been found? Which hours are the peak and trough?
 
 ```{r}

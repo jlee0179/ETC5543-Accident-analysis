@@ -185,39 +185,18 @@ total_drvr_dpt <- driver_info %>%
 svr_dpt <- inc_severity_dept %>%
   left_join(total_drvr_dpt, by = c("Depot", "CompanyID")) %>%
   mutate(has_incident_dpt = (num_drv_inc/num_of_drvr)*100) %>%
-  mutate(across(has_incident_dpt, round, 2))%>%
+  mutate(across(has_incident_dpt, round, 2)) %>%
   pivot_wider(names_from = severity, values_from = has_incident_dpt) %>%
   mutate(serious = replace_na(serious, 0),
          slight = replace_na(slight, 0))
-
-
-plot_ly(data = svr_dpt, x = ~Depot, color = ~CompanyID) %>%
-  add_trace(y = ~serious) %>%
-  add_trace(y = ~slight) %>%
-  layout(
-    title = "Proportion of drivers had claims by Depot and Severity",
-    updatemenus = list(
-      list(
-        y = 1.0,
-        buttons = list(
-          list(method = "update",
-               args = list(list(visible = list(TRUE, FALSE)),
-                           list(yaxis = list(title = "Drivers had claims (%)"))),
-               label = "serious"),
-
-          list(method = "update",
-               args = list(list(visible =  list(FALSE, TRUE)),
-                           list(yaxis = list(title = "Drivers had claims (%)"))),
-               label = "serious")))
-      )
-    )
 
 plot_ly(svr_dpt, x = ~Depot, mode='markers') %>%
   add_trace(y = ~serious, name = 'serious', type='bar', mode='markers') %>%
   add_trace(y = ~slight, name = 'slight', type='bar', mode='markers') %>%
   layout(
     title = "Proportion of drivers had claims by Depot and Severity",
-    yaxis = list(title = "Drivers had claims (%)"),
+    yaxis = list(title = "Drivers had claims (%)",
+                 range=c(0,100)),
     updatemenus = list(
       list(
         type = "buttons",
@@ -306,7 +285,7 @@ total_drvr_gdr <- driver_info %>%
 svr_gdr <- inc_severity_gdr %>%
   left_join(total_drvr_gdr, by = c("Gender", "CompanyID")) %>%
   mutate(has_incident_gdr = (num_drv_inc/num_of_drvr)*100) %>%
-  mutate(across(has_incident_gdr, round, 2))%>%
+  mutate(across(has_incident_gdr, round, 2)) %>%
   pivot_wider(names_from = severity, values_from = has_incident_gdr) %>%
   mutate(serious = replace_na(serious, 0),
          slight = replace_na(slight, 0))
@@ -316,11 +295,10 @@ plot_ly(svr_gdr, x = ~Gender, mode='markers') %>%
   add_trace(y = ~serious, name = 'serious', type='bar', mode='markers') %>%
   add_trace(y = ~slight, name = 'slight', type='bar', mode='markers') %>%
   layout(
-    yaxis = list(
+    yaxis = list(title = "Drivers had claims (%)",
       range=c(0,100)
     ),
     title = "Proportion of drivers had claims by Gender and Severity",
-    yaxis = list(title = "Drivers had claims (%)"),
     updatemenus = list(
       list(
         type = "buttons",
@@ -337,6 +315,8 @@ plot_ly(svr_gdr, x = ~Gender, mode='markers') %>%
     )
   )
 ```
+
+
 
 ### Age
 
@@ -420,6 +400,82 @@ inc_age %>%
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   labs(x = "Age group", y = "Drivers had claims", fill = "Age group", title = "Proportion of drivers had claims by Age")
+```
+
+```{r}
+inc_severity_age <- severity_inc %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears(),
+         driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) 
+
+inc_severity_age$driver_age <- round(inc_severity_age$driver_age, digits = 0)
+inc_severity_age <- inc_severity_age %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
+
+inc_severity_age <- inc_severity_age %>%
+  group_by(age_group, driver_incident, EmployeeID, severity) %>%
+  summarise(driver_age_group = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
+  group_by(age_group, severity) %>%
+  summarise(num_drv_inc = sum(driver_age_group))
+  
+drvr_info_age <- driver_info %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears())
+drvr_info_age$driver_age <- round(drvr_info_age$driver_age, digits = 0)
+drvr_info_age <- drvr_info_age %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
+drvr_info_age <- drvr_info_age %>%
+  group_by(age_group) %>%
+  summarise(num_of_drvr = n())
+
+svr_age <- inc_severity_age %>%
+  full_join(drvr_info_age, by = "age_group") %>%
+  mutate(has_incident_age = (num_drv_inc/num_of_drvr)*100) %>%
+  mutate(across(has_incident_age, round, 2)) %>%
+  pivot_wider(names_from = severity, values_from = has_incident_age) %>%
+  mutate(serious = replace_na(serious, 0),
+         slight = replace_na(slight, 0))
+
+plot_ly(svr_age, x = ~age_group, mode='markers') %>%
+  add_trace(y = ~serious, name = 'serious', type='bar', mode='markers') %>%
+  add_trace(y = ~slight, name = 'slight', type='bar', mode='markers') %>%
+  layout(
+    title = "Proportion of drivers had claims by Age group and Severity",
+    xaxis = list(title = "Age group"),
+    yaxis = list(title = "Drivers had claims (%)",
+                 range=c(0,100)),
+    updatemenus = list(
+      list(
+        type = "buttons",
+        label = 'Category',
+        buttons = list(
+          list(method = "restyle",
+               args = list('visible', c(TRUE, FALSE, FALSE)),
+               label = "serious"),
+          list(method = "restyle",
+               args = list('visible', c(FALSE, TRUE, FALSE)),
+               label = "slight")
+        )
+      )
+    )
+  )
 ```
 
 2. On what day have most incidents been found? Which hours are the peak and trough?

@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
+library(hrbrthemes)
 library(lubridate)
 library(plotly)
 library(tidyverse)
@@ -539,7 +540,9 @@ daynight_incidents %>%
 dh_incidents <- incidents %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
-  mutate(date_hour = format(DateOccurred, format = "%Y-%m-%d %H"))
+  mutate(date_hour = format(DateOccurred, format = "%Y-%m-%d %H"),
+         hour = hour(DateOccurred)) %>%
+  filter(company %in% c("TDNSW", "TDM"))
 
 melbourneweather <- melbourneweather %>%
   mutate(company = "TDM",
@@ -547,14 +550,24 @@ melbourneweather <- melbourneweather %>%
   rename(Temperature = `Melbourne Temperature`, Precipitation = `Melbourne Precipitation Total`)
 
 sydneyweather <- sydneyweather %>%
-  mutate(company = "TDM",
+  mutate(company = "TDNSW",
          date_hour = format(timestamp, format = "%Y-%m-%d %H")) %>%
   rename(Temperature = `Sydney Temperature`, Precipitation = `Sydney Precipitation Total`)
 
 mel_syd_weather <- rbind(melbourneweather, sydneyweather)
 
-weather_incidents <- mel_syd_weather %>%
-  inner_join(dh_incidents, by = c("company", "date_hour")) 
+weather_n_incidents <- mel_syd_weather %>%
+  full_join(dh_incidents, by = c("company", "date_hour")) %>%
+  mutate(rain = case_when(Precipitation >= 2.5 ~ "Yes",
+                          Precipitation < 2.5 ~ "No"),
+         has_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes"))
+
+weather_n_incidents %>%
+  filter(rain == "Yes") %>%
+  ggplot(aes(x = hour, group = has_incident, fill = has_incident)) +
+  geom_density(alpha = 0.5) +
+  facet_grid(~company)
 
 weather_incidents %>%
   mutate(date = format(timestamp, format = "%Y-%m-%d")) %>%

@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(lubridate)
+library(plotly)
 library(tidyverse)
 ```
 
@@ -159,6 +160,81 @@ drvr_inc_dpt %>%
 
 ```
 
+```{r}
+severity_inc <- incidents %>%
+  mutate(severity = case_when(TypeOfClaimName %in% c("MVA - Hit by Third Party", "MVA - Hit parked vehicle", "Customer Injury- Heavy Braking", "MVA - Hit moving vehicle while driving straight", "MVA - Hit moving vehicle while turning", "MVA - Hit stationary vehicle while turning", "MVA - Hit stationary vehicle driving straight", "MVA - Hit illegally parked vehicle", "MVA - Hit moving vehicle while changing lanes", "Pedestrian Injury - Hit by Transdev vehicle", "MVA - Hit bus station", "Employee Injury - Motor Vehicle Accident", "Motor Vehicle Collision", "Collision with Public") ~ "serious",
+                              TypeOfClaimName %in% c("MVA - Hit tree/ tree branch", "MVA - Hit barrier/ bollard", "MVA - Near Miss", "MVA - Reversing", "MVA bus stop sign", "MVA bus stop pole") ~ "slight")) %>%
+  filter(severity %in% c("serious", "slight"))
+
+inc_severity_dept <- severity_inc %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) %>%
+  group_by(Depot, CompanyID, driver_incident, EmployeeID, severity) %>%
+  summarise(driver_depot = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
+  group_by(Depot, severity, CompanyID) %>%
+  summarise(num_drv_inc = sum(driver_depot))
+  
+total_drvr_dpt <- driver_info %>%
+  group_by(Depot, CompanyID) %>%
+  summarise(num_of_drvr = n())
+
+svr_dpt <- inc_severity_dept %>%
+  left_join(total_drvr_dpt, by = c("Depot", "CompanyID")) %>%
+  mutate(has_incident_dpt = (num_drv_inc/num_of_drvr)*100) %>%
+  mutate(across(has_incident_dpt, round, 2))%>%
+  pivot_wider(names_from = severity, values_from = has_incident_dpt) %>%
+  mutate(serious = replace_na(serious, 0),
+         slight = replace_na(slight, 0))
+
+
+plot_ly(data = svr_dpt, x = ~Depot, color = ~CompanyID) %>%
+  add_trace(y = ~serious) %>%
+  add_trace(y = ~slight) %>%
+  layout(
+    title = "Proportion of drivers had claims by Depot and Severity",
+    updatemenus = list(
+      list(
+        y = 1.0,
+        buttons = list(
+          list(method = "update",
+               args = list(list(visible = list(TRUE, FALSE)),
+                           list(yaxis = list(title = "Drivers had claims (%)"))),
+               label = "serious"),
+
+          list(method = "update",
+               args = list(list(visible =  list(FALSE, TRUE)),
+                           list(yaxis = list(title = "Drivers had claims (%)"))),
+               label = "serious")))
+      )
+    )
+
+plot_ly(svr_dpt, x = ~Depot, mode='markers') %>%
+  add_trace(y = ~serious, name = 'serious', type='bar', mode='markers') %>%
+  add_trace(y = ~slight, name = 'slight', type='bar', mode='markers') %>%
+  layout(
+    title = "Proportion of drivers had claims by Depot and Severity",
+    yaxis = list(title = "Drivers had claims (%)"),
+    updatemenus = list(
+      list(
+        type = "buttons",
+        label = 'Category',
+        buttons = list(
+          list(method = "restyle",
+               args = list('visible', c(TRUE, FALSE, FALSE)),
+               label = "serious"),
+          list(method = "restyle",
+               args = list('visible', c(FALSE, TRUE, FALSE)),
+               label = "slight")
+        )
+      )
+    )
+  )
+```
+
 ### Gender
 
 ```{r}
@@ -208,6 +284,58 @@ drvr_inc_gdr %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   labs(y = "Drivers had claims", fill = "Gender", title = "Proportion of drivers had claims by Gender and company")
   
+```
+
+```{r}
+inc_severity_gdr <- severity_inc %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) %>%
+  group_by(Gender, CompanyID, driver_incident, EmployeeID, severity) %>%
+  summarise(driver_depot = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
+  group_by(Gender, severity, CompanyID) %>%
+  summarise(num_drv_inc = sum(driver_depot))
+  
+total_drvr_gdr <- driver_info %>%
+  group_by(Gender, CompanyID) %>%
+  summarise(num_of_drvr = n())
+
+svr_gdr <- inc_severity_gdr %>%
+  left_join(total_drvr_gdr, by = c("Gender", "CompanyID")) %>%
+  mutate(has_incident_gdr = (num_drv_inc/num_of_drvr)*100) %>%
+  mutate(across(has_incident_gdr, round, 2))%>%
+  pivot_wider(names_from = severity, values_from = has_incident_gdr) %>%
+  mutate(serious = replace_na(serious, 0),
+         slight = replace_na(slight, 0))
+
+
+plot_ly(svr_gdr, x = ~Gender, mode='markers') %>%
+  add_trace(y = ~serious, name = 'serious', type='bar', mode='markers') %>%
+  add_trace(y = ~slight, name = 'slight', type='bar', mode='markers') %>%
+  layout(
+    yaxis = list(
+      range=c(0,100)
+    ),
+    title = "Proportion of drivers had claims by Gender and Severity",
+    yaxis = list(title = "Drivers had claims (%)"),
+    updatemenus = list(
+      list(
+        type = "buttons",
+        label = 'Category',
+        buttons = list(
+          list(method = "restyle",
+               args = list('visible', c(TRUE, FALSE, FALSE)),
+               label = "serious"),
+          list(method = "restyle",
+               args = list('visible', c(FALSE, TRUE, FALSE)),
+               label = "slight")
+        )
+      )
+    )
+  )
 ```
 
 ### Age
@@ -347,12 +475,7 @@ daynight_incidents %>%
   labs(x = "Daytime/night", y = "Total claim number")
 ```
 
-```{r}
-tmp2 %>%
-  filter(match_type == 2) %>%
-  
-  
-```
+
 
 4. What kind of weather (temperature and precipitation) is considered safer or dangerous for bus drivers?
 
@@ -374,8 +497,8 @@ sydneyweather <- sydneyweather %>%
 
 mel_syd_weather <- rbind(melbourneweather, sydneyweather)
 
-weather_incidents <- dh_incidents %>%
-  inner_join(mel_syd_weather, by = c("company", "date_hour")) 
+weather_incidents <- mel_syd_weather %>%
+  inner_join(dh_incidents, by = c("company", "date_hour")) 
 
 weather_incidents %>%
   mutate(date = format(timestamp, format = "%Y-%m-%d")) %>%

@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
+library(ggridges)
 library(hrbrthemes)
 library(lubridate)
 library(plotly)
@@ -586,13 +587,54 @@ weather_n_incidents %>%
   theme(legend.title = element_blank()) +
   scale_fill_discrete(labels=c("Non-incident", "Incident")) +
   labs(x = "Hour of day", title = "Incident and non-incident distribution under little/no rain condition")
+
+
+weather_n_incidents %>%
+  filter(rain == "No") %>%
+ggplot(
+  aes(x = Temperature, y = has_incident, fill = stat(x))
+  ) +
+  geom_density_ridges_gradient(scale = 3, size = 0.3, rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Temp. [F]", option = "C") +
+  labs(title = 'Temperatures in Lincoln NE') 
+
+```
+
+```{r}
+weather_n_incidents %>%
+  ggplot(aes(x = Temperature, group = has_incident, fill = has_incident)) +
+  geom_density(alpha = 0.5) +
+  facet_grid(~company) +
+  theme_minimal()
+
+ggplot(
+  weather_n_incidents, 
+  aes(x = Temperature, y = `Month`, fill = stat(x))
+  ) +
+  geom_density_ridges_gradient(scale = 3, size = 0.3, rel_min_height = 0.01) +
+  scale_fill_viridis_c(name = "Temp. [F]", option = "C") +
+  labs(title = 'Temperatures in Lincoln NE') 
 ```
 
 5. Is there a relationship between drivers' driving hours within a day and the likelihood of getting into an incident?
 
 ```{r}
-tmp2 %>%
+tmp2_when_occur <- tmp2 %>%
   filter(match_type == 2) %>%
-  mutate(i_driving_hour = )
+  distinct(EmployeeID, ClaimCategoryName, DateOccurred, .keep_all = TRUE) %>%
+  mutate(diff_occur_start = difftime(DateOccurred, shift_start),
+         diff_occur_start = diff_occur_start/dhours())
+tmp2_when_occur$diff_occur_start <- round(tmp2_when_occur$diff_occur_start, digits = 0) 
+
+ggplot(tmp2_when_occur, aes(x = diff_occur_start)) +
+  geom_density() +
+  labs(x = "Number of hour(s) after shift start", y = "Number of claims", title = "Hour(s) that claims made after drivers' driving hours in NSW")
+
+tmp2_when_occur %>%
+  group_by(diff_occur_start) %>%
+  summarise(num_inc = n()) %>%
+  ggplot() +
+  geom_point(aes(x = diff_occur_start, y = num_inc)) +
+  labs(x = "Number of hour(s) after shift start", y = "Number of claims", title = "Hour(s) that claims made after drivers' driving hours in NSW")
 ```
 

@@ -563,17 +563,20 @@ weather_n_incidents <- mel_syd_weather %>%
                           Precipitation < 2.5 ~ "No"),
          has_incident = case_when(is.na(ClaimNumber) ~ "No",
                                          !is.na(ClaimNumber) ~ "Yes"))
+# mutate precipitation as numeric instead of character
 
 weather_n_incidents %>%
   filter(rain == "Yes") %>%
-  ggplot(aes(x = hour, group = has_incident, fill = has_incident)) +
+  ggplot(aes(x = Precipitation, group = has_incident, fill = has_incident)) +
   geom_density(alpha = 0.5) +
   facet_grid(~company) +
   theme_minimal() +
   theme(legend.title = element_blank()) +
   scale_fill_discrete(labels=c("Non-incident", "Incident")) +
   labs(x = "Hour of day", title = "Incident and non-incident distribution under rainy condition")
-
+# x axis should be rainfall
+# don't filter rain
+# filter(MVA)
 ```
 
 ```{r}
@@ -587,7 +590,7 @@ weather_n_incidents %>%
   scale_fill_discrete(labels=c("Non-incident", "Incident")) +
   labs(x = "Hour of day", title = "Incident and non-incident distribution under little/no rain condition")
 
-
+# x axis should be rainfall
 
 ```
 
@@ -615,5 +618,11 @@ ggplot(tmp2_when_occur, aes(x = diff_occur_start)) +
   geom_density() +
   theme_minimal() +
   labs(x = "Number of hour(s) after shift start", title = "Hour(s) that claims made after drivers' driving hours in NSW")
+
+# broken down by daytime/night
+# filter(MVA)
 ```
 
+FIT a model to predict incident, understand the relationship between variables. Random forest (suggested), can discover non-linear relationship, build tree diagrams, get variable importance. e.g. given an hour, is it going to be incident or not. variables e.g. gender, hour of driving, weather, time of day.
+
+Rain distribution can do t-test, test significance. NOTE: look up requirements for t-test.

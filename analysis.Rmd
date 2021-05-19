@@ -113,20 +113,6 @@ sydneyweather <- sydneyweather %>%
 ### Questions:
 1. How are drivers' characteristics (Depot, gender and age) affecting the incidents? Which is contributing the most incidents?
 
-```{r}
-incidents %>%
-  drop_na(EmployeeNumber) %>%
-  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
-  inner_join(driver_info, by = "EmployeeID") %>%
-  group_by(Depot, company) %>%
-  summarise(total_cases_num = n()) %>%
-  ggplot(aes(x = Depot, y = total_cases_num, fill = company)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = total_cases_num)) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(y = "Total claim number", title = "Total claim by depot")
-```
 
 
 ```{r}
@@ -218,21 +204,6 @@ plot_ly(svr_dpt, x = ~Depot, mode='markers') %>%
 
 ### Gender
 
-```{r}
-incidents %>%
-  drop_na(EmployeeNumber) %>%
-  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
-  inner_join(driver_info, by = "EmployeeID") %>%
-  group_by(Gender, company) %>%
-  summarise(total_cases_num = n()) %>%
-  ggplot(aes(x = Gender, y = total_cases_num, fill = Gender)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = total_cases_num)) +
-  theme_minimal() +
-  facet_wrap(~company) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(y = "Total claim number", title = "Total claim by gender and State")
-```
 
 ```{r}
 drvr_inc_gdr <- incidents %>%
@@ -321,33 +292,6 @@ plot_ly(svr_gdr, x = ~Gender, mode='markers') %>%
 
 
 ### Age
-
-```{r}
-age_incidents <- incidents %>%
-  drop_na(EmployeeNumber) %>%
-  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
-  inner_join(driver_info, by = "EmployeeID") %>%
-  mutate(driver_age = today() - dmy(BirthDate),
-         driver_age = driver_age/dyears()) 
-age_incidents$driver_age <- round(age_incidents$driver_age, digits = 0)
-age_incidents <- age_incidents %>%
-  mutate(age_group = case_when(driver_age >= 21 & driver_age <= 30 ~ "21-30",
-                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
-                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
-                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
-                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
-                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
-                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
-age_incidents %>%
-  group_by(age_group) %>%
-  summarise(total_cases_num = n()) %>%
-  ggplot(aes(x = age_group, y = total_cases_num, fill = age_group)) +
-  geom_bar(stat = "identity") +
-  geom_text(aes(label = total_cases_num)) +
-  theme_minimal() +
-  labs(x = "Age group", y = "Total claim number", title = "Total claim by age group", fill = "Age group")
-  
-```
 
 ```{r}
 inc_age <- incidents %>%

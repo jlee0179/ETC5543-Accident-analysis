@@ -482,11 +482,12 @@ daynight_incidents %>%
 4. What kind of weather (temperature and precipitation) is considered safer or dangerous for bus drivers?
 
 ```{r}
-dh_incidents <- incidents %>%
+dh_mva_incidents <- incidents %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
   mutate(date_hour = format(DateOccurred, format = "%Y-%m-%d %H")) %>%
-  filter(company %in% c("TDNSW", "TDM"))
+  filter(company %in% c("TDNSW", "TDM"),
+         str_starts(TypeOfClaimName, "MVA"))
 
 melbourneweather <- melbourneweather %>%
   mutate(company = "TDM",
@@ -502,51 +503,51 @@ mel_syd_weather <- rbind(melbourneweather, sydneyweather)
 
 weather_n_incidents <- mel_syd_weather %>%
   mutate(hour = hour(timestamp)) %>%
-  left_join(dh_incidents, by = c("company", "date_hour")) %>%
-  mutate(rain = case_when(Precipitation >= 2.5 ~ "Yes",
+  left_join(dh_mva_incidents, by = c("company", "date_hour")) %>%
+  mutate(Temperature = as.numeric(Temperature),
+         Precipitation = as.numeric(Precipitation),
+         rain = case_when(Precipitation >= 2.5 ~ "Yes",
                           Precipitation < 2.5 ~ "No"),
          has_incident = case_when(is.na(ClaimNumber) ~ "No",
-                                         !is.na(ClaimNumber) ~ "Yes"),
-         Temperature = as.numeric(Temperature),
-         Precipitation = as.numeric(Precipitation))
+                                         !is.na(ClaimNumber) ~ "Yes"))
 
 weather_n_incidents %>%
-  filter(rain == "Yes") %>%
-  filter()
+  #filter(rain == "Yes") %>%
   ggplot(aes(x = Precipitation, group = has_incident, fill = has_incident)) +
   geom_density(alpha = 0.5) +
-  facet_grid(~company) +
+  facet_wrap(~company, nrow = 2) +
   theme_minimal() +
   theme(legend.title = element_blank()) +
   scale_fill_discrete(labels=c("Non-incident", "Incident")) +
-  labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under rainy condition")
+  labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under rainy condition measured by precipitation") +
+  expand_limits(x = -0.5)
 
 # don't filter rain
-# filter(MVA)
+
 ```
 
 ```{r}
 weather_n_incidents %>%
   filter(rain == "No") %>%
-  ggplot(aes(x = hour, group = has_incident, fill = has_incident)) +
+  ggplot(aes(x = Precipitation, group = has_incident, fill = has_incident)) +
   geom_density(alpha = 0.5) +
-  facet_grid(~company) +
+  facet_wrap(~company, nrow = 2) +
   theme_minimal() +
   theme(legend.title = element_blank()) +
   scale_fill_discrete(labels=c("Non-incident", "Incident")) +
-  labs(x = "Hour of day", title = "Incident and non-incident distribution under little/no rain condition")
-
-# x axis should be rainfall
+  labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under little/no rain condition measured by precipitation") 
 
 ```
 
 ```{r}
 weather_n_incidents %>%
-  filter(rain == "Yes") %>%
   ggplot(aes(x = Temperature, group = has_incident, fill = has_incident)) +
   geom_density(alpha = 0.5) +
   facet_grid(~company) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  scale_fill_discrete(labels=c("Non-incident", "Incident")) +
+  labs(x = "Temperature (°C)", title = "Incident and non-incident distribution measured by temperature")
 
 ```
 
@@ -557,7 +558,8 @@ tmp2_when_occur <- tmp2 %>%
   filter(match_type == 2) %>%
   distinct(EmployeeID, ClaimCategoryName, DateOccurred, .keep_all = TRUE) %>%
   mutate(diff_occur_start = difftime(DateOccurred, shift_start),
-         diff_occur_start = diff_occur_start/dhours())
+         diff_occur_start = diff_occur_start/dhours()) %>%
+  filter(str_starts(TypeOfClaimName, "MVA"))
 tmp2_when_occur$diff_occur_start <- round(tmp2_when_occur$diff_occur_start, digits = 0) 
 
 ggplot(tmp2_when_occur, aes(x = diff_occur_start)) +
@@ -566,7 +568,7 @@ ggplot(tmp2_when_occur, aes(x = diff_occur_start)) +
   labs(x = "Number of hour(s) after shift start", title = "Hour(s) that claims made after drivers' driving hours in NSW")
 
 # broken down by daytime/night
-# filter(MVA)
+
 ```
 
 FIT a model to predict incident, understand the relationship between variables. Random forest (suggested), can discover non-linear relationship, build tree diagrams, get variable importance. e.g. given an hour, is it going to be incident or not. variables e.g. gender, hour of driving, weather, time of day.

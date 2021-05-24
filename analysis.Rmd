@@ -506,19 +506,21 @@ weather_n_incidents <- mel_syd_weather %>%
   mutate(rain = case_when(Precipitation >= 2.5 ~ "Yes",
                           Precipitation < 2.5 ~ "No"),
          has_incident = case_when(is.na(ClaimNumber) ~ "No",
-                                         !is.na(ClaimNumber) ~ "Yes"))
-# mutate precipitation as numeric instead of character
+                                         !is.na(ClaimNumber) ~ "Yes"),
+         Temperature = as.numeric(Temperature),
+         Precipitation = as.numeric(Precipitation))
 
 weather_n_incidents %>%
   filter(rain == "Yes") %>%
+  filter()
   ggplot(aes(x = Precipitation, group = has_incident, fill = has_incident)) +
   geom_density(alpha = 0.5) +
   facet_grid(~company) +
   theme_minimal() +
   theme(legend.title = element_blank()) +
   scale_fill_discrete(labels=c("Non-incident", "Incident")) +
-  labs(x = "Hour of day", title = "Incident and non-incident distribution under rainy condition")
-# x axis should be rainfall
+  labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under rainy condition")
+
 # don't filter rain
 # filter(MVA)
 ```

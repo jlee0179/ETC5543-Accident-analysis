@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
+library(caret)
 library(ggridges)
 library(hrbrthemes)
 library(lubridate)
@@ -634,16 +635,12 @@ nswshifts_drvhour_split <- initial_split(nswshifts_drvhour, 2/3,
 nswshifts_drvhour_tr <- training(nswshifts_drvhour_split)
 nswshifts_drvhour_ts <- testing(nswshifts_drvhour_split)
 
-nswshifts_drvhour_rf <- rand_forest() %>%
-  set_engine("randomForest",
-             importance = TRUE, proximity = TRUE) %>%
-  set_mode("classification") %>%
-  fit(has_incident~drive_hour+start_hour+Gender, data = nswshifts_drvhour_tr)
+nswshifts_drvhour_rf <- randomForest(has_incident~drive_hour+start_hour+Gender, data = nswshifts_drvhour_tr, importance = TRUE)
 
 #nswshifts_drvhour_ts$Gender <- factor(nswshifts_drvhour_ts$Gender, levels = levels(nswshifts_drvhour_tr$Gender))
 
 nswshifts_drvhour_ts_pred <- nswshifts_drvhour_ts %>%
-  mutate(.pred = predict(nswshifts_drvhour_rf, nswshifts_drvhour_ts)$.pred_class)
+  mutate(.pred = predict(nswshifts_drvhour_rf, nswshifts_drvhour_ts))
 
 importance(nswshifts_drvhour_rf)
 
@@ -653,6 +650,10 @@ importance(nswshifts_drvhour_rf)
   
 
 
+
+```
+
+```{r}
 
 ```
 

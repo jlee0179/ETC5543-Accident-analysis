@@ -425,14 +425,19 @@ plot_ly(svr_age, x = ~age_group, mode='markers') %>%
         buttons = list(
           list(method = "restyle",
                args = list('visible', c(TRUE, FALSE, FALSE)),
-               label = "serious"),
+               label = "Serious Only"),
           list(method = "restyle",
                args = list('visible', c(FALSE, TRUE, FALSE)),
-               label = "slight")
+               label = "Slight Only"),
+          list(method = "restyle",
+               args = list("visible", TRUE),
+               label = "Show All")
         )
       )
     )
   )
+
+
 ```
 
 2. On what day have most incidents been found? Which hours are the peak and trough?

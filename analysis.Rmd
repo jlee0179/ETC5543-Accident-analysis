@@ -178,9 +178,12 @@ svr_dpt <- inc_severity_dept %>%
   mutate(serious = replace_na(serious, 0),
          slight = replace_na(slight, 0))
 
-plot_ly(svr_dpt, x = ~Depot, mode='markers') %>%
-  add_trace(y = ~serious, name = 'serious', type='bar', mode='markers') %>%
-  add_trace(y = ~slight, name = 'slight', type='bar', mode='markers') %>%
+svr_dpt %>%
+  mutate(serious_label = paste0(CompanyID," - Serious"),
+         slight_label = paste0(CompanyID," - Slight")) %>%
+  plot_ly(x = ~Depot, color = ~CompanyID) %>%
+  add_trace(y = ~serious, name = ~serious_label, type='bar',width = 0.3) %>%
+  add_trace(y = ~slight, name = ~slight_label, type='bar', width=0.3,opacity=0.5) %>%
   layout(
     title = "Proportion of drivers had claims by Depot and Severity",
     yaxis = list(title = "Drivers had claims (%)",
@@ -188,14 +191,17 @@ plot_ly(svr_dpt, x = ~Depot, mode='markers') %>%
     updatemenus = list(
       list(
         type = "buttons",
-        label = 'Category',
+        #label = 'Category',
         buttons = list(
           list(method = "restyle",
-               args = list('visible', c(TRUE, FALSE, FALSE)),
-               label = "serious"),
+               args = list('visible', c(rep(TRUE,3), rep(FALSE,3))),
+               label = "Serious Only"),
           list(method = "restyle",
-               args = list('visible', c(FALSE, TRUE, FALSE)),
-               label = "slight")
+               args = list('visible', c(rep(FALSE,3), rep(TRUE,3))),
+               label = "Slight Only"),
+          list(method = "restyle",
+               args = list('visible', TRUE),
+               label = "Show All")
         )
       )
     )
@@ -263,10 +269,12 @@ svr_gdr <- inc_severity_gdr %>%
   mutate(serious = replace_na(serious, 0),
          slight = replace_na(slight, 0))
 
-
-plot_ly(svr_gdr, x = ~Gender, mode='markers') %>%
-  add_trace(y = ~serious, name = 'serious', type='bar', mode='markers') %>%
-  add_trace(y = ~slight, name = 'slight', type='bar', mode='markers') %>%
+svr_gdr %>%
+  mutate(serious_label = paste0(CompanyID," - Serious"),
+         slight_label = paste0(CompanyID," - Slight")) %>%
+  plot_ly(x = ~Gender, color = ~CompanyID) %>%
+  add_trace(y = ~serious, name = ~serious_label, type='bar') %>%
+  add_trace(y = ~slight, name = ~slight_label, type='bar',opacity=0.5)  %>%
   layout(
     yaxis = list(title = "Drivers had claims (%)",
       range=c(0,100)
@@ -278,11 +286,14 @@ plot_ly(svr_gdr, x = ~Gender, mode='markers') %>%
         label = 'Category',
         buttons = list(
           list(method = "restyle",
-               args = list('visible', c(TRUE, FALSE, FALSE)),
-               label = "serious"),
+               args = list('visible', c(rep(TRUE,3), rep(FALSE,3))),
+               label = "Serious Only"),
           list(method = "restyle",
-               args = list('visible', c(FALSE, TRUE, FALSE)),
-               label = "slight")
+               args = list('visible', c(rep(FALSE,3), rep(TRUE,3))),
+               label = "Slight Only"),
+          list(method = "restyle",
+               args = list('visible', TRUE),
+               label = "Show All")
         )
       )
     )

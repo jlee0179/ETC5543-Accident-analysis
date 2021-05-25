@@ -645,17 +645,67 @@ nswshifts_drvhour_ts_pred <- nswshifts_drvhour_ts %>%
 importance(nswshifts_drvhour_rf)
 
 
-
-
-  
-
-
-
 ```
 
 ```{r}
-
+a <- weather_n_incidents %>%
+  left_join(tmp2_mva, by = c("ClaimNumber", "EmployeeID", "ClaimCategoryName", "TypeOfClaimName", "DateOccurred")) %>%
+  na.omit(shift_end, shift_start)
+  mutate(drive_hour = difftime(shift_end, shift_start),
+         drive_hour = drive_hour/dhours()) %>%
+  
+  
 ```
 
 Rain distribution can do t-test, test significance. NOTE: look up requirements for t-test.
+two-sample t-test
+paired t-test
+```{r}
+# compare precipitation between has_incident=yes and has_incident=no
+rain_inc <- weather_n_incidents %>%
+  select(Precipitation, has_incident) 
+# has_incident = yes
+summary(rain_inc %>%
+          filter(has_incident == "Yes") %>%
+          .$Precipitation)
 
+summary(rain_inc %>%
+          filter(has_incident == "No") %>%
+          .$Precipitation)
+```
+
+```{r}
+ggplot(rain_inc, aes(Precipitation)) +
+        geom_histogram(fill = "white", color = "grey30") +
+        facet_wrap(~has_incident) +
+        scale_x_log10()
+```
+
+```{r}
+wilcox.test(Precipitation ~ has_incident, data = rain_inc)
+```
+
+Temperature: 
+
+```{r}
+temp_inc <- weather_n_incidents %>%
+  select(Temperature, has_incident) 
+# has_incident = yes
+summary(rain_inc %>%
+          filter(has_incident == "Yes") %>%
+          .$Temperature)
+
+summary(rain_inc %>%
+          filter(has_incident == "No") %>%
+          .$Temperature)
+```
+
+```{r}
+ggplot(temp_inc, aes(Temperature)) +
+        geom_histogram(fill = "white", color = "grey30") +
+        facet_wrap(~has_incident) 
+```
+
+```{r}
+t.test(Temperature ~ has_incident, data = temp_inc)
+```

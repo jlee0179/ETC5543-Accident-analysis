@@ -649,14 +649,48 @@ importance(nswshifts_drvhour_rf)
 ```
 
 ```{r}
-a <- weather_n_incidents %>%
-  left_join(tmp2_mva, by = c("ClaimNumber", "EmployeeID", "ClaimCategoryName", "TypeOfClaimName", "DateOccurred")) %>%
-  na.omit(shift_end, shift_start)
-  mutate(drive_hour = difftime(shift_end, shift_start),
-         drive_hour = drive_hour/dhours()) %>%
-  
-# cross table function  
+# fix the original random forest dataframe
+nswshifts1 <- nswshifts %>%
+  rename(shift_start = VdsTripStartTime, shift_end = VdsTripEndTime) %>%
+  mutate(JoinDate = as.Date(shift_start)) %>%
+  select(EmployeeID, shift_start, shift_end, JoinDate)
+
+incident1 <- incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  filter(company == "TDNSW", str_starts(TypeOfClaimName, "MVA")) %>%
+  mutate(JoinDate = as.Date(DateOccurred)) %>%
+  group_by(EmployeeID, JoinDate) %>%
+  select(EmployeeID, DateOccurred, JoinDate)
+
+nswshifts_lj_inc <- nswshifts1 %>%
+  group_by(EmployeeID, JoinDate) %>%
+  summarise(shift_start = min(shift_start)-30*60,
+            shift_end = max(shift_end)+30*60) %>%
+  left_join(incident1, by = c("EmployeeID", "JoinDate")) %>%
+  select(EmployeeID, shift_start, shift_end, DateOccurred) %>%
+  mutate(has_incident = case_when(is.na(DateOccurred) ~ "No",
+                                         !is.na(DateOccurred) ~ "Yes"))
+
+nswshifts_lj_inc %>%
+  mutate(shift_date = as.Date(shift_start),
+         shift_start_hour = hour(shift_start),
+         shift_end_hour = hour(shift_end),
+         Occurred_hour = hour(DateOccurred)) %>% 
+  # creating list of shift hours between start and end hour & then unnesting the dataframe to make it long
+  rowwise() %>%
+  mutate(shift_hour_of_day = list(c(shift_start_hour:shift_end_hour))) %>%
+  unnest(cols = c(shift_hour_of_day)) %>%
+  mutate(shift_hour_for_driver = shift_hour_of_day - shift_start_hour) %>%
+  # some further wrangling to remove unneccessary columns & convert incident hour into hourly indicator & restrict inc
+  mutate(incident_indicator = case_when(
+    Occurred_hour == shift_hour_of_day ~ 1,
+    TRUE                               ~ 0
+  )) %>%
+  select(-shift_start, -shift_end, -DateOccurred, -Occurred_hour)
 ```
+
+
 
 Rain distribution can do t-test, test significance. NOTE: look up requirements for t-test.
 two-sample t-test

@@ -672,7 +672,7 @@ nswshifts_lj_inc <- nswshifts1 %>%
   mutate(has_incident = case_when(is.na(DateOccurred) ~ "No",
                                          !is.na(DateOccurred) ~ "Yes"))
 
-nswshifts_lj_inc %>%
+long_shifts_inc <- nswshifts_lj_inc %>%
   mutate(shift_date = as.Date(shift_start),
          shift_start_hour = hour(shift_start),
          shift_end_hour = hour(shift_end),
@@ -690,7 +690,10 @@ nswshifts_lj_inc %>%
   select(-shift_start, -shift_end, -DateOccurred, -Occurred_hour)
 ```
 
-
+```{r}
+long_shifts_inc$timestamp <- as_datetime(with(long_shifts_inc, paste(shift_date, shift_hour_of_day, sep = " ")), "%Y-%m-%d %H:%m:%s")
+  
+```
 
 Rain distribution can do t-test, test significance. NOTE: look up requirements for t-test.
 two-sample t-test

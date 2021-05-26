@@ -692,7 +692,7 @@ long_shifts_inc <- nswshifts_lj_inc %>%
 
 ```{r}
 long_shifts_inc$timestamp <- as_datetime(with(long_shifts_inc, paste(shift_date, shift_hour_of_day, sep = " ")), "%Y-%m-%d %H:%m:%s")
-  
+  # Use difftime to fix shift hour for driver
 ```
 
 Rain distribution can do t-test, test significance. NOTE: look up requirements for t-test.

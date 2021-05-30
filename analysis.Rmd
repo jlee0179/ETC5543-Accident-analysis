@@ -540,7 +540,6 @@ weather_n_incidents %>%
   labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under rainy condition measured by precipitation") +
   expand_limits(x = -0.5)
 
-# don't filter rain
 
 ```
 
@@ -553,8 +552,9 @@ weather_n_incidents %>%
   theme_minimal() +
   theme(legend.title = element_blank()) +
   scale_fill_discrete(labels=c("Non-incident", "Incident")) +
-  labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under little/no rain condition measured by precipitation") 
-# cut off the x-axis
+  labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under little/no rain condition measured by precipitation") +
+  expand_limits(x = -0.2:2.4)
+
 
 ```
 
@@ -681,6 +681,9 @@ long_shifts_inc <- nswshifts_lj_inc %>%
   rowwise() %>%
   mutate(shift_hour_of_day = list(c(shift_start_hour:shift_end_hour))) %>%
   unnest(cols = c(shift_hour_of_day)) %>%
+  #mutate(shift_start_hour = paste(shift_start_hour, "00", sep = ":"),
+         #shift_start_hour = shift_start_hour %>% hm())
+  #mutate(shift_hour_for_driver = difftime(shift_hour_of_day, shift_start_hour)) %>%
   mutate(shift_hour_for_driver = shift_hour_of_day - shift_start_hour) %>%
   # some further wrangling to remove unneccessary columns & convert incident hour into hourly indicator & restrict inc
   mutate(incident_indicator = case_when(

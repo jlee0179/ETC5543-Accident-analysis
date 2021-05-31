@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(caret)
 library(ggridges)
 library(hrbrthemes)
+library(kableExtra)
 library(lubridate)
 library(plotly)
 library(randomForest)
@@ -113,8 +114,8 @@ sydneyweather <- sydneyweather %>%
 ```
 
 ### Questions:
-1. How are drivers' characteristics (Depot, gender and age) affecting the incidents? Which is contributing the most incidents?
 
+1. How are drivers' characteristics (Depot, gender and age) affecting the incidents? Which is contributing the most incidents?
 
 
 ```{r}
@@ -302,6 +303,34 @@ svr_gdr %>%
   )
 ```
 
+```{r}
+gen_inc <- incidents %>%
+  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) %>%
+  group_by(Gender, driver_incident, EmployeeID) %>%
+  summarise(driver_depot = n_distinct(EmployeeID)) %>%
+  group_by(Gender, driver_incident) %>%
+  summarise(num_drv_inc = sum(driver_depot))
+
+tot_drv_gen <- driver_info %>%
+  distinct(EmployeeID, Gender) %>%
+  group_by(Gender) %>%
+  summarise(num_of_drvr = n())
+
+gen_inc %>%
+  pivot_wider(names_from = driver_incident, values_from = num_drv_inc) %>%
+  left_join(tot_drv_gen, by = "Gender") %>%
+  mutate(has_incident_gdr = (Yes/num_of_drvr)*100) %>%
+  mutate(across(has_incident_gdr, round, 2)) %>%
+  rename(incident = Yes, `no incident` = No, total = num_of_drvr, prop = has_incident_gdr) %>%
+  kable() %>%
+  kable_styling()
+```
+
 
 
 ### Age
@@ -441,6 +470,7 @@ plot_ly(svr_age, x = ~age_group, mode='markers') %>%
 
 
 ```
+
 
 2. On what day have most incidents been found? Which hours are the peak and trough?
 

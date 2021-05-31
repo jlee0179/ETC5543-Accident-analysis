@@ -681,22 +681,24 @@ long_shifts_inc <- nswshifts_lj_inc %>%
   rowwise() %>%
   mutate(shift_hour_of_day = list(c(shift_start_hour:shift_end_hour))) %>%
   unnest(cols = c(shift_hour_of_day)) %>%
-  #mutate(shift_start_hour = paste(shift_start_hour, "00", sep = ":"),
-         #shift_start_hour = shift_start_hour %>% hm())
-  #mutate(shift_hour_for_driver = difftime(shift_hour_of_day, shift_start_hour)) %>%
   mutate(shift_hour_for_driver = shift_hour_of_day - shift_start_hour) %>%
   # some further wrangling to remove unneccessary columns & convert incident hour into hourly indicator & restrict inc
   mutate(incident_indicator = case_when(
     Occurred_hour == shift_hour_of_day ~ 1,
     TRUE                               ~ 0
   )) %>%
-  select(-shift_start, -shift_end, -DateOccurred, -Occurred_hour)
+# added in order to use difftime
+  mutate(shift_start_hour = strptime(shift_start_hour, format = "%H"),
+         shift_hour_of_day = strptime(shift_hour_of_day, format = "%H"),
+         shift_hour_for_driver = difftime(shift_hour_of_day, shift_start_hour),
+         shift_hour_for_driver = shift_hour_for_driver/dhours()) %>%
+  # try to bind shift_start date with hour, but not working for shift_hour_of_day
+         #shift_start_hour = strptime(paste(shift_start, shift_start_hour), format = "%Y-%m-%d %H"),
+         #shift_hour_of_day = strptime(paste(shift_start, shift_hour_of_day)), format = "%Y-%m-%d %H")) %>%
+  select(-shift_start, -shift_end, -DateOccurred, -Occurred_hour) 
 ```
 
-```{r}
-long_shifts_inc$timestamp <- as_datetime(with(long_shifts_inc, paste(shift_date, shift_hour_of_day, sep = " ")), "%Y-%m-%d %H:%m:%s")
-  # Use difftime to fix shift hour for driver
-```
+
 
 Rain distribution can do t-test, test significance. NOTE: look up requirements for t-test.
 two-sample t-test

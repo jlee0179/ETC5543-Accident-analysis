@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r}
+library(broom)
 library(caret)
 library(ggridges)
 library(hrbrthemes)
@@ -321,17 +322,27 @@ tot_drv_gen <- driver_info %>%
   group_by(Gender) %>%
   summarise(num_of_drvr = n())
 
-gen_inc %>%
+gen_inc_tab <- gen_inc %>%
   pivot_wider(names_from = driver_incident, values_from = num_drv_inc) %>%
   left_join(tot_drv_gen, by = "Gender") %>%
   mutate(has_incident_gdr = (Yes/num_of_drvr)*100) %>%
   mutate(across(has_incident_gdr, round, 2)) %>%
-  rename(incident = Yes, `no incident` = No, total = num_of_drvr, prop = has_incident_gdr) %>%
+  rename(incident = Yes, `no incident` = No, total = num_of_drvr, prop = has_incident_gdr) 
+gen_inc_tab %>%
   kable() %>%
   kable_styling()
+
+
 ```
 
-
+```{r}
+test_x <- as.matrix(gen_inc_tab %>%
+                      ungroup() %>%
+                      select(incident, `no incident`))
+CLTest_gen <- prop.test(test_x)
+tidy(CLTest_gen)
+```
+0.02 < 0.05 Reject the null hypothesis. The data provides strong evidence that gender does have an effect on incidents.
 
 ### Age
 

@@ -646,6 +646,8 @@ weather_n_incidents %>%
 
 ```
 
+
+
 5. Is there a relationship between drivers' driving hours within a day and the likelihood of getting into an incident?
 
 ```{r}

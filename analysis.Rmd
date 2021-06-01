@@ -17,6 +17,7 @@ library(ggridges)
 library(hrbrthemes)
 library(kableExtra)
 library(lubridate)
+library(parsnip)
 library(plotly)
 library(randomForest)
 library(tidyverse)
@@ -304,6 +305,8 @@ svr_gdr %>%
   )
 ```
 
+MVA
+
 ```{r}
 gen_inc <- incidents %>%
   filter(str_starts(TypeOfClaimName, "MVA")) %>%
@@ -482,6 +485,38 @@ plot_ly(svr_age, x = ~age_group, mode='markers') %>%
 
 ```
 
+MVA
+
+```{r}
+age_mva_inc <- incidents %>%
+  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears(),
+         driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes"))
+age_mva_inc$driver_age <- round(age_mva_inc$driver_age, digits = 0)
+logistic_mod <- logistic_reg() %>% 
+  set_engine("glm") %>% #<<
+  set_mode("classification") %>% 
+  translate()
+
+age_mva_inc <- age_mva_inc %>%
+  mutate(driver_incident = factor(driver_incident))
+
+age_mva_inc_fit <- 
+  logistic_mod %>% 
+  fit(driver_incident ~ driver_age, 
+      data = age_mva_inc)
+
+tidy(age_mva_inc_fit) %>% 
+  kable() %>% 
+  kable_styling()
+```
+
+Driver's age doesn't explain much of the occurrence of incidents.
 
 2. On what day have most incidents been found? Which hours are the peak and trough?
 

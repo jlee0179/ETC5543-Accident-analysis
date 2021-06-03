@@ -39,3 +39,7 @@ vignettes/*.pdf
 .Renviron
 
 data/
+
+/preliminary mva.Rmd
+/preliminary-mva.html
+/preliminary-mva.Rmd

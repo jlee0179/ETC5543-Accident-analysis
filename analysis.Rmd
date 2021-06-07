@@ -832,8 +832,7 @@ nsw_fit_split <- initial_split(nsw_fit_df, 2/3,
 nsw_fit_tr <- training(nsw_fit_split)
 nsw_fit_ts <- testing(nsw_fit_split)
 
-nsw_fit_rf <- randomForest(incident_indicator ~ shift_hour_of_day + shift_hour_for_driver + 
-                             Temperature + Precipitation + Gender, data = nsw_fit_tr, importance = TRUE)
+nsw_fit_rf <- randomForest(incident_indicator ~ shift_hour_of_day+shift_hour_for_driver+Temperature+Precipitation+Gender, data = nsw_fit_tr, importance = TRUE)
 print(nsw_fit_rf)
 
 nsw_fit_ts_pred <- nsw_fit_ts %>%
@@ -842,6 +841,9 @@ nsw_fit_ts_pred <- nsw_fit_ts %>%
 importance(nsw_fit_rf)
 varImpPlot(nsw_fit_rf)
 ```
+
+Mean Decrease Accuracy: How much the model accuracy decreases if we drop that variable.
+Mean Decrease Gini: Measure of variable importance based on Gini impurity index used for the calculation of splits in trees.
 
 Rain distribution can do t-test, test significance. NOTE: look up requirements for t-test.
 two-sampled t-test

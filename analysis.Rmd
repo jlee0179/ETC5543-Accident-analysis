@@ -20,6 +20,7 @@ library(lubridate)
 library(parsnip)
 library(plotly)
 library(randomForest)
+library(rsample)
 library(tidyverse)
 ```
 
@@ -805,17 +806,40 @@ long_shifts_inc <- nswshifts_lj_inc %>%
     Occurred_hour == shift_hour_of_day ~ 1,
     TRUE                               ~ 0
   )) %>%
-# added in order to use difftime
-  # try to bind shift_start date with hour, but not working for shift_hour_of_day
-         #shift_start_hour = strptime(paste(shift_start, shift_start_hour), format = "%Y-%m-%d %H"),
-         #shift_hour_of_day = strptime(paste(shift_start, shift_hour_of_day)), format = "%Y-%m-%d %H")) %>%
   select(-shift_start, -shift_end, -DateOccurred, -Occurred_hour) 
 
-long_shifts_inc %>%
+sydneyweather_dh <- sydneyweather %>%
+  mutate(date = as.Date(timestamp),
+         hour = hour(timestamp))
+
+nsw_fit_df <- long_shifts_inc %>%
+  left_join(sydneyweather_dh, by = c("shift_date" = "date", "shift_hour_of_day" = "hour")) %>%
+  left_join(driver_info, by = "EmployeeID") %>%
+  ungroup() %>%
+  select(-EmployeeID, -has_incident, -shift_date, -shift_start_hour, -shift_end_hour, -trip_duration, -timestamp, -Depot, -CompanyID, -EmployeeStartDate, -EmploymentTerminationDate, -Position, -ContractType, -FTE, -BirthDate) %>% 
+  mutate(Gender = case_when(Gender == "Male" ~ 1,
+                            Gender == "Female" ~ 0))
   
 ```
 
+```{r}
+set.seed(2021)
+nsw_fit_df <- nsw_fit_df %>%
+  na.omit() %>%
+  mutate(incident_indicator = factor(incident_indicator)) 
+nsw_fit_split <- initial_split(nsw_fit_df, 2/3,
+                                         strata = incident_indicator)
+nsw_fit_tr <- training(nsw_fit_split)
+nsw_fit_ts <- testing(nsw_fit_split)
 
+nsw_fit_rf <- randomForest(incident_indicator ~ shift_hour_of_day + shift_hour_for_driver + 
+                             Temperature + Precipitation + Gender, data = nsw_fit_tr, importance = TRUE)
+
+nsw_fit_ts_pred <- nsw_fit_ts %>%
+  mutate(.pred = predict(nsw_fit_rf, nsw_fit_ts))
+
+importance(nsw_fit_rf)
+```
 
 Rain distribution can do t-test, test significance. NOTE: look up requirements for t-test.
 two-sampled t-test

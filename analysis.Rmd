@@ -834,11 +834,13 @@ nsw_fit_ts <- testing(nsw_fit_split)
 
 nsw_fit_rf <- randomForest(incident_indicator ~ shift_hour_of_day + shift_hour_for_driver + 
                              Temperature + Precipitation + Gender, data = nsw_fit_tr, importance = TRUE)
+print(nsw_fit_rf)
 
 nsw_fit_ts_pred <- nsw_fit_ts %>%
   mutate(.pred = predict(nsw_fit_rf, nsw_fit_ts))
 
 importance(nsw_fit_rf)
+varImpPlot(nsw_fit_rf)
 ```
 
 Rain distribution can do t-test, test significance. NOTE: look up requirements for t-test.

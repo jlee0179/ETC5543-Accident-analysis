@@ -498,24 +498,56 @@ age_mva_inc <- incidents %>%
          driver_incident = case_when(is.na(ClaimNumber) ~ "No",
                                          !is.na(ClaimNumber) ~ "Yes"))
 age_mva_inc$driver_age <- round(age_mva_inc$driver_age, digits = 0)
+age_mva_inc <- age_mva_inc %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90")) %>%
+  group_by(age_group, driver_incident, EmployeeID) %>%
+  summarise(driver_age_group = n_distinct(EmployeeID)) %>%
+  group_by(age_group, driver_incident) %>%
+  summarise(num_drvage_inc = sum(driver_age_group))
+
+tot_drv_age <- driver_info %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears())
+
+tot_drv_age$driver_age <- round(tot_drv_age$driver_age, digits = 0)
+
+tot_drv_age <- tot_drv_age %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90")) %>%
+  distinct(EmployeeID, age_group) %>%
+  group_by(age_group) %>%
+  summarise(num_of_drvr = n())
+
+age_inc_tab <- age_mva_inc %>%
+  pivot_wider(names_from = driver_incident, values_from = num_drvage_inc) %>%
+  left_join(tot_drv_age, by = "age_group") %>%
+  mutate(has_incident_age = (Yes/num_of_drvr)*100) %>%
+  mutate(across(has_incident_age, round, 2)) %>%
+  rename(`age group` = age_group, incident = Yes, `no incident` = No, total = num_of_drvr, prop = has_incident_age) 
 
 # ordinal e.g. 20-30, 41-50, 51-60, 61-70. Same contingency format
-logistic_mod <- logistic_reg() %>% 
-  set_engine("glm") %>% #<<
-  set_mode("classification") %>% 
-  translate()
-
-age_mva_inc <- age_mva_inc %>%
-  mutate(driver_incident = factor(driver_incident))
-
-age_mva_inc_fit <- 
-  logistic_mod %>% 
-  fit(driver_incident ~ driver_age, 
-      data = age_mva_inc)
-
-tidy(age_mva_inc_fit) %>% 
-  kable() %>% 
+age_inc_tab %>%
+  kable() %>%
   kable_styling()
+```
+
+```{r}
+test_x1 <- as.matrix(age_inc_tab %>%
+                      ungroup() %>%
+                      select(incident, `no incident`))
+CLTest_age <- prop.test(test_x1)
+tidy(CLTest_age)
 ```
 
 Driver's age doesn't explain much of the occurrence of incidents.

@@ -351,6 +351,7 @@ tidy(CLTest_gen)
 ```
 0.02 < 0.05 Reject the null hypothesis. The data provides strong evidence that gender does have an effect on incidents.
 
+The small ( <5%) p-value suggests that the null hypothesis of equal proportions can be rejected. Difference in gender doesn't have an effect on incidents.
 
 
 ### Age

@@ -560,6 +560,47 @@ tidy(CLTest_age)
 Driver's age doesn't explain much of the occurrence of incidents.
 
 ```{r}
+res.aov <- age_inc_tab %>% anova_test(prop ~ `age group`)
+res.aov
+
+
+```
+
+```{r}
+#head(age_inc_tab)
+#str(age_inc_tab)
+#model_fit <- lm(prop ~ `age group`, data=age_inc_tab)
+#summary(model_fit)
+
+tmp_tash <- incidents %>%
+  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears(),
+         driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes"),
+         driver_age = round(driver_age,digits=0),
+         age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90")) %>%
+  mutate(binary_outcome = case_when(
+    driver_incident == 'Yes' ~ 1,
+    TRUE ~ 0
+  ))
+
+head(tmp_tash)
+model_fit <- lm(binary_outcome ~ age_group, data=tmp_tash) #double check this is logistic regression, not linear regression
+summary(model_fit)
+# find anova function that gives p value breakdown - something like summary.aov()
+```
+
+```{r}
 age_mva_inc1 <- incidents %>%
   filter(str_starts(TypeOfClaimName, "MVA")) %>%
   drop_na(EmployeeNumber) %>%
@@ -611,6 +652,8 @@ test_x2 <- as.matrix(yo70_inc_tab %>%
 CLTest_yo70 <- prop.test(test_x2)
 tidy(CLTest_yo70)
 ```
+
+May be less data for older than 70. Can't conclude that drivers older than 70 have less incidents.
 
 ```{r}
 res.aov <- age_inc_tab %>% anova_test(prop ~ `age group`)
@@ -874,33 +917,52 @@ long_shifts_inc <- nswshifts_lj_inc %>%
 
 sydneyweather_dh <- sydneyweather %>%
   mutate(date = as.Date(timestamp),
-         hour = hour(timestamp))
+         hour = hour(timestamp),
+         hour = case_when(hour == 0 ~ 24,
+                          TRUE ~ as.numeric(hour)))
 
 nsw_fit_df <- long_shifts_inc %>%
   left_join(sydneyweather_dh, by = c("shift_date" = "date", "shift_hour_of_day" = "hour")) %>%
   left_join(driver_info, by = "EmployeeID") %>%
   ungroup() %>%
-  select(-EmployeeID, -has_incident, -shift_date, -shift_start_hour, -shift_end_hour, -trip_duration, -timestamp, -Depot, -CompanyID, -EmployeeStartDate, -EmploymentTerminationDate, -Position, -ContractType, -FTE, -BirthDate) %>% 
-  mutate(Gender = case_when(Gender == "Male" ~ 1,
-                            Gender == "Female" ~ 0))
+  select(-EmployeeID, -has_incident, -shift_date, -shift_start_hour, -shift_end_hour, -trip_duration, -timestamp, -Depot, -CompanyID, -EmployeeStartDate, -EmploymentTerminationDate, -Position, -ContractType, -FTE, -BirthDate, -company, -date_hour) 
   
 ```
 
 ```{r}
 set.seed(2021)
+
 nsw_fit_df <- nsw_fit_df %>%
   na.omit() %>%
   mutate(incident_indicator = factor(incident_indicator)) 
 nsw_fit_split <- initial_split(nsw_fit_df, 2/3,
                                          strata = incident_indicator)
-nsw_fit_tr <- training(nsw_fit_split)
+nsw_fit_tr <- training(nsw_fit_split) %>% 
+  mutate(Gender = factor(Gender)) %>% 
+  mutate(Precipitation = as.numeric(Precipitation)) %>%
+  mutate(Temperature = as.numeric(Temperature))
 nsw_fit_ts <- testing(nsw_fit_split)
 
-nsw_fit_rf <- randomForest(incident_indicator ~ shift_hour_of_day+shift_hour_for_driver+Temperature+Precipitation+Gender, data = nsw_fit_tr, importance = TRUE)
+down_train <- downSample(x = nsw_fit_tr[, -ncol(nsw_fit_tr)],
+                         y = nsw_fit_tr$incident_indicator)
+table(down_train$incident_indicator)   
+
+nsw_fit_rf <- randomForest(incident_indicator ~ shift_hour_of_day+shift_hour_for_driver+Temperature+Precipitation, data = down_train, importance = TRUE)
 print(nsw_fit_rf)
 
+test_model <- lm(incident_indicator ~ shift_hour_of_day + shift_hour_for_driver + Temperature + Precipitation, data=down_train)
+
 nsw_fit_ts_pred <- nsw_fit_ts %>%
-  mutate(.pred = predict(nsw_fit_rf, nsw_fit_ts))
+  mutate(.pred = predict(nsw_fit_rf, nsw_fit_ts, type = "prob"))
+
+#caret package, fix classes to be balanced, rerun random forest, check classification matrix
+# train random forest on different error functions false positive rate or recall/precision
+
+
+table(actual = nsw_fit_ts$incident_indicator, predicted = nsw_fit_ts_pred$.pred)
+
+table(nsw_fit_tr$incident_indicator)
+1689/(1689+40033)
 
 importance(nsw_fit_rf)
 varImpPlot(nsw_fit_rf)

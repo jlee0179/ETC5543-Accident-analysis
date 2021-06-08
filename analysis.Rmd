@@ -122,7 +122,7 @@ sydneyweather <- sydneyweather %>%
 
 1. How are drivers' characteristics (Depot, gender and age) affecting the incidents? Which is contributing the most incidents?'
 
-How are drivers' characteristics (Depot, gender and age) affecting the incidents? Is there 
+How are drivers' characteristics (Depot, gender and age) affecting the incidents? Do they genuinely contribute to the occurrence of incidents?
 
 
 ```{r}

@@ -1,0 +1,1035 @@
+---
+title: "ETC5543 Business analytics creative activity"
+subtitle: "Presentation"
+author: "Joyce Lee"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: 
+      - default
+      - default-fonts
+      - duke-blue
+      - hygge-duke
+      - libs/cc-fonts.css
+      - libs/figure-captions.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+```{r include=FALSE}
+library(base)
+library(broom)
+library(caret)
+library(ggridges)
+library(hrbrthemes)
+library(kableExtra)
+library(lubridate)
+library(parsnip)
+library(plotly)
+library(randomForest)
+library(randomForestExplainer)
+library(rsample)
+library(rstatix)
+library(tidyverse)
+```
+
+```{r include=FALSE}
+driver_info <- read_csv("data/Driver_Info.csv") %>%
+  filter(!Depot == "Not Given")
+incidents <- read_csv("data/Incidents.csv")
+nswshifts <- read_csv("data/NSWshifts.csv") %>%
+  distinct()
+melbourneweather <- read_csv("data/melbourneweather_20150101_20210428.csv")
+sydneyweather <- read_csv("data/sydneyweather_20150101_20210415.csv")
+```
+
+```{r include=FALSE}
+incidents <- incidents %>%
+  unite(EmployeeID, c("company", "EmployeeNumber"), remove = FALSE)
+```
+
+```{r include=FALSE}
+nswshifts$VdsCompany <- toupper(nswshifts$VdsCompany)
+nswshifts <- nswshifts %>%
+  unite(EmployeeID, c("VdsCompany", "VdsEmployeeId"), remove = FALSE)
+
+
+tmp <- incidents %>%
+  filter(company == 'TDNSW') %>%
+  select(ClaimNumber, EmployeeID, ClaimCategoryName, TypeOfClaimName, DateOccurred) %>%
+  mutate(JoinDate = as.Date(DateOccurred)) %>%
+  left_join(nswshifts %>%
+              mutate(JoinDate = as.Date(VdsTripStartTime)),
+            by = c("EmployeeID","JoinDate")) %>%
+  mutate(match_type = case_when(
+    is.na(VdsTripStartTime) ~ 0,
+    DateOccurred >= VdsTripStartTime & DateOccurred <= VdsTripEndTime ~ 2,
+    TRUE ~ 1
+  ))
+matched <-
+  tmp %>%
+  inner_join(
+    tmp %>% group_by(ClaimNumber) %>% summarise(match_type = max(match_type)),
+    by = c("ClaimNumber", "match_type")
+  ) %>%
+  arrange(match_type,ClaimNumber,VdsTripStartTime)
+
+tmp2 <- incidents %>%
+  filter(company == 'TDNSW') %>%
+  select(ClaimNumber, EmployeeID, ClaimCategoryName, TypeOfClaimName,DateOccurred) %>%
+  mutate(JoinDate = as.Date(DateOccurred)) %>%
+  left_join(nswshifts %>%
+              mutate(JoinDate = as.Date(VdsTripStartTime)) %>%
+              group_by(EmployeeID, JoinDate) %>%
+              summarise(shift_start = min(VdsTripStartTime)-30*60,
+                        shift_end = max(VdsTripEndTime)+30*60),
+            by = c("EmployeeID","JoinDate")) %>%
+  mutate(match_type = case_when(
+    is.na(shift_start) ~ 0,
+    DateOccurred >= shift_start & DateOccurred <= shift_end ~ 2,
+    TRUE ~ 1
+  ))
+matched <-
+  tmp2 %>%
+  inner_join(
+    tmp2 %>% group_by(ClaimNumber) %>% summarise(match_type = max(match_type)),
+    by = c("ClaimNumber", "match_type")
+  ) %>%
+  arrange(match_type,ClaimNumber,shift_start)
+
+tmp <- tmp %>%
+  mutate(day_of_week = weekdays(as.Date(DateOccurred)))
+
+tmp2 <- tmp2 %>%
+  mutate(day_of_week = weekdays(as.Date(DateOccurred)))
+```
+
+```{r include=FALSE}
+melbourneweather <- melbourneweather %>%
+  slice(-1:-9) %>%
+  select(location, Melbourne, Melbourne_1) %>%
+  rename(c(timestamp = location, `Melbourne Temperature` = Melbourne, `Melbourne Precipitation Total` = Melbourne_1)) 
+melbourneweather <- melbourneweather %>%
+        mutate(timestamp = ymd_hm(timestamp))
+
+```
+
+```{r include=FALSE}
+sydneyweather <- sydneyweather %>%
+  slice(-1:-9) %>%
+  select(location, Sydney, Sydney_1) %>%
+  rename(c(timestamp = location, `Sydney Temperature` = Sydney, `Sydney Precipitation Total` = Sydney_1)) 
+sydneyweather <- sydneyweather %>%
+        mutate(timestamp = ymd_hm(timestamp))
+```
+
+class: center, middle
+
+.pull-left[
+
+## Organisation
+
+<img src = "https://www.lynxx.com.au/wp-content/uploads/2015/12/Lynxx_logo-website2x.png" width = "50%" />
+
+.blue["Translate" gathered data in to readable information]
+
+.blue[Analyse information with insights]
+
+.blue[Conclude the outcomes with potential solutions]
+
+]
+
+.pull-right[
+
+## Client
+
+<img src = "https://www.transdevmelbourne.com.au/media/10481/transdev-logo-new.png" width = "50%" />
+
+.blue[Statistical links between accidents and factors]
+
+.blue[Meaningful and logical patterns from the data]
+
+.blue[Traffic congestion examination]
+
+.blue[Variables of interest: Weather, Daylight vs Dark, Shift length, where incident occurred in shift, etc.]
+
+]
+
+**My goals**: 
+
+To reveal the current conditions and existing problems of incidents, regarding variables of interest. 
+
+To look at the associations precisely, using statistical approaches.
+
+
+---
+class: middle
+
+# Data
+
+* Driver_Info: All drivers' personal information with their employment records.
+
+* Incidents: Incidents / claims made across NSW, VIC and WA with details recorded.
+
+* NSWshifts: Shifts information in NSW, e.g. the start and end datetimes for the trips.   
+
+* melbourneweather_20150101_20210428: Meteorological-relevant information (temperature, precipitation, humidity, etc.) measured hourly in Melbourne from 1st January, 2015 to 28th April, 2021.
+
+* sydneyweather_20150101_20210415: Meteorological-relevant information (temperature, precipitation, humidity, etc.) measured hourly in Sydney from 1st January, 2015 to 15th April, 2021.
+
+
+---
+
+class: middle, center
+
+.full-width[.content-box-duke-green[1) How are drivers' characteristics (Depot, gender and age) affecting the incidents? Do they genuinely contribute to the occurrence of incidents?]]
+
+---
+
+# Drivers had claims by **depot** (%) 
+
+```{r echo=FALSE, message=FALSE, fig.dim=c(12,8)}
+# all drivers in each depot
+drvr_inc_dpt <- incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) %>%
+  group_by(Depot, CompanyID, driver_incident, EmployeeID) %>%
+  summarise(driver_depot = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
+  group_by(Depot, CompanyID) %>%
+  summarise(num_drv_inc = sum(driver_depot))
+
+total_drvr_dpt <- driver_info %>%
+  group_by(Depot, CompanyID) %>%
+  summarise(num_of_drvr = n())
+
+drvr_inc_dpt %>%
+  left_join(total_drvr_dpt, by = c("Depot", "CompanyID")) %>%
+  mutate(has_incident_dpt = (num_drv_inc/num_of_drvr)*100) %>%
+  mutate(across(has_incident_dpt, round, 2)) %>%
+  ggplot(aes(x = Depot, y = has_incident_dpt, fill = CompanyID)) +
+  geom_bar(stat = "identity") + 
+  geom_text(aes(label = has_incident_dpt), vjust=1.6, color="white", size=2.5) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(y = "Drivers had claims", fill = "Company", title = "Proportion of drivers had claims by Depot")
+
+
+```
+
+---
+
+# Drivers had claims by **depot** (%), classified with incidents severity
+
+```{r echo=FALSE, message=FALSE}
+severity_inc <- incidents %>%
+  mutate(severity = case_when(TypeOfClaimName %in% c("MVA - Hit by Third Party", "MVA - Hit parked vehicle", "Customer Injury- Heavy Braking", "MVA - Hit moving vehicle while driving straight", "MVA - Hit moving vehicle while turning", "MVA - Hit stationary vehicle while turning", "MVA - Hit stationary vehicle driving straight", "MVA - Hit illegally parked vehicle", "MVA - Hit moving vehicle while changing lanes", "Pedestrian Injury - Hit by Transdev vehicle", "MVA - Hit bus station", "Employee Injury - Motor Vehicle Accident", "Motor Vehicle Collision", "Collision with Public") ~ "serious",
+                              TypeOfClaimName %in% c("MVA - Hit tree/ tree branch", "MVA - Hit barrier/ bollard", "MVA - Near Miss", "MVA - Reversing", "MVA bus stop sign", "MVA bus stop pole") ~ "slight")) %>%
+  filter(severity %in% c("serious", "slight"))
+
+inc_severity_dept <- severity_inc %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) %>%
+  group_by(Depot, CompanyID, driver_incident, EmployeeID, severity) %>%
+  summarise(driver_depot = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
+  group_by(Depot, severity, CompanyID) %>%
+  summarise(num_drv_inc = sum(driver_depot))
+  
+total_drvr_dpt <- driver_info %>%
+  group_by(Depot, CompanyID) %>%
+  summarise(num_of_drvr = n())
+
+svr_dpt <- inc_severity_dept %>%
+  left_join(total_drvr_dpt, by = c("Depot", "CompanyID")) %>%
+  mutate(has_incident_dpt = (num_drv_inc/num_of_drvr)*100) %>%
+  mutate(across(has_incident_dpt, round, 2)) %>%
+  pivot_wider(names_from = severity, values_from = has_incident_dpt) %>%
+  mutate(serious = replace_na(serious, 0),
+         slight = replace_na(slight, 0))
+
+p1 <- svr_dpt %>%
+  mutate(serious_label = paste0(CompanyID," - Serious"),
+         slight_label = paste0(CompanyID," - Slight")) %>%
+  plot_ly(x = ~Depot, color = ~CompanyID) %>%
+  add_trace(y = ~serious, name = ~serious_label, type='bar',width = 0.3) %>%
+  add_trace(y = ~slight, name = ~slight_label, type='bar', width=0.3,opacity=0.5) %>%
+  layout(
+    title = "Proportion of drivers had claims by Depot and Severity",
+    yaxis = list(title = "Drivers had claims (%)",
+                 range=c(0,100)),
+    updatemenus = list(
+      list(
+        type = "buttons",
+        #label = 'Category',
+        buttons = list(
+          list(method = "restyle",
+               args = list('visible', c(rep(TRUE,3), rep(FALSE,3))),
+               label = "Serious Only"),
+          list(method = "restyle",
+               args = list('visible', c(rep(FALSE,3), rep(TRUE,3))),
+               label = "Slight Only"),
+          list(method = "restyle",
+               args = list('visible', TRUE),
+               label = "Show All")
+        )
+      )
+    )
+  )
+
+htmlwidgets::saveWidget(p1,paste0("p1.html"))
+```
+
+<iframe src="p1.html" width="100%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"> </iframe>
+
+---
+
+# Hello World
+
+Install the **dukeslides**<sup>1</sup> package from [Github](https://github.com/libjohn/dukeslides)
+
+```{r eval=FALSE, tidy=FALSE}
+# monospace font is displayed when code is written 
+# inside of an Rmarkdown code chunk
+devtools::install_github("libjohn/dukeslides")
+```
+
+.content-box-grey[
+- **Create a new R Markdown document** from the menu `File -> New File -> R Markdown -> From Template -> Slide template for Duke University`
+]
+
+.content-box-grey[
+- Click the **`Knit`** button **to compile** the slide into rendered HTML]
+
+.footnote[
+[1] [dukeslides](https://github.com/libjohn/dukeslides/) is a [Duke University branded](https://styleguide.duke.edu/color-palette/) version of [xaringan presentation slides](https://slides.yihui.name/xaringan/).
+]
+
+---
+# Making Bullets
+
+- List items (bullets) are invoked with a leading, left-justified dash, just like any Rmarkdown<sup>1</sup> document
+
+``` r
+- List items (bullets) are invoked with a leading,
+left-justified dash, just like any 
+Rmarkdown<sup>1</sup> document
+```
+.footnote[
+[1] [Getting Started with R Markdown](https://rmarkdown.rstudio.com/lesson-1.html)
+]
+
+--
+
+``` r
+--
+```
+
+- Two left-justified dashes creates a pause to reveal the slide in increments.  `arrow` keys and number keys advance from slide to slide. [See more documentation on incrementing](https://slides.yihui.name/xaringan/incremental.html#11)
+
+---
+# Knit
+
+As previously mentioned, 
+
+.content-box-grey[
+- Click the **`Knit`** button **to compile** the slide into rendered HTML
+]
+
+Or, use the [RStudio Addin](https://rstudio.github.io/rstudioaddins/) "Infinite Moon Reader" to live preview the slides (every time you update and save the Rmd document, the slides will be automatically reloaded in RStudio Viewer.
+
+
+---
+background-image: url(https://c2.staticflickr.com/6/5729/30943501632_eb0b200eed_b.jpg)
+class: center, top
+
+# Rock Cairn Hiking
+
+.justify-left[
+``` r
+---
+background-image: url(https://c2.staticflickr.com/6/5729/30943501632_eb0b200eed_b.jpg)
+class: center, top
+
+# Rock Cairn Hiking
+
+.footer-note[.tiny[.green[Image Credit: ][Brandon Rasmussen](https://www.flickr.com/photos/137029081@N02/30943501632/in/photostream/)]]
+
+```
+]
+
+
+.footer-note[.tiny[.green[Image Credit: ][Brandon Rasmussen](https://www.flickr.com/photos/137029081@N02/30943501632/in/photostream/)]]
+
+???
+
+``` r
+---
+background-image: url(https://c2.staticflickr.com/6/5729/30943501632_eb0b200eed_b.jpg)
+class: center, top, inverse
+
+# Rock Cairn Hiking
+
+
+.footer-note[.tiny[.green[Image Credit: ][Brandon Rasmussen](https://www.flickr.com/photos/137029081@N02/30943501632/in/photostream/)]]
+```
+
+---
+## Two Column
+
+.pull-left[
+- You can generate a left column 
+
+- by wrapping the left-hand text in `.pull-left[` foo `]`
+
+- TAGS <sup>1</sup>
+
+- Splunk
+]
+
+.pull-right[
+- You can generate a right column 
+
+- by wrapping the right-hand text in `.pull-right[` foo `]`
+
+- foo
+
+- foo <sup>2</sup>
+]
+
+
+``` r
+# superscript is wrapped in HTML
+TAGS <sup>1</sup>
+
+```
+
+
+.footnote[
+[1] example foonote 1  -- footnote text wrapped in `.footnote[foo]`
+
+[2] example footnote 2 
+]
+
+---
+class: inverse
+
+## inverse
+
+### h3
+
+Lorem Ipsum
+
+"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
+
+``` r
+---
+class: inverse
+
+## inverse
+
+### h3
+
+Lorem Ipsum
+
+"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
+```
+
+
+---
+class: duke-softblue
+
+## duke-softblue
+
+``` r
+---
+class: duke-softblue
+```
+
+Lorem Ipsum
+
+"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
+
+- one
+
+- [Google](http://google.com)
+
+- three
+
+---
+class: duke-orange
+
+## duke-orange
+
+``` r
+---
+class: duke-orange
+```
+
+Lorem Ipsum
+
+"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
+
+- one
+
+- [Google](http://google.com)
+
+- three
+
+---
+class: duke-green
+
+## duke-green
+
+``` r
+---
+class: duke-green
+```
+
+"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
+
+- one
+
+- [Green website inspirations](https://webdesignledger.com/50-green-web-designs-to-inspire-you/)
+
+- three
+
+---
+background-image: url(http://www.publicdomainpictures.net/pictures/170000/velka/hand-holding-old-keys-1462981136Ul1.jpg)
+background-size: contain
+
+## hygge-duke Two Column
+
+.content-box-grey[ qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit... ]
+
+
+.pull-left[
+&nbsp;
+
+&nbsp;
+
+&nbsp; 
+
+``` r
+.pull-left[ 
+   nabisco crackers 
+   snackum attackum ...
+   ]
+```
+]
+
+&nbsp; 
+
+.pull-right[.full-width[.rotate-left[.content-box-blue[
+
+- Wrap the right-hand text in \.pull-right\[ \.content-box-blue\]
+
+&nbsp; 
+
+&nbsp; 
+
+&nbsp;
+
+
+``` r
+.pull-right[.full-width[
+  .rotate-left[
+    .content-box-blue[snackum 
+      nabiskum]
+]]]
+```
+
+]]]]
+
+<!-- Image credit:  http://www.publicdomainpictures.net/view-image.php?image=167489  -->
+
+&nbsp; 
+
+.footnote[.scriptsize[
+- `background-size: contain`
+- `View Source` to see all of the R Markdown for this slide
+]]
+
+???
+
+Image credit:  http://www.publicdomainpictures.net/view-image.php?image=167489
+
+---
+
+# Modifying text
+
+.pull-left[
+
+## Font sizes
+
+This is normal size ( $\LaTeX$-friendly terms)
+
+.Large[Large]
+
+.large[large]
+
+.small[small]
+
+.footnotesize[footnotesize]
+
+.scriptsize[scriptsize]
+
+.tiny[tiny]
+
+]
+
+.pull-right[
+
+## Text color
+
+.black[black]
+
+.red[red]
+
+.blue[blue]
+
+.green[green], 
+.yellow[yellow], 
+.orange[orange], 
+.purple[purple], 
+.gray[gray or grey]
+
+You can also use `.bold[]` or `.bolder[]` to emphasize text 
+
+This is .bold[bold], this is .bolder[bolder] and this is regular markdown **double-star bold** (visible differences depend on the font)
+
+]
+
+.content-box-green[.scriptsize[.justify-center[
+[Hegge CSS](http://biostatistics.dk/presentations/xaringan/ghoul.html) + [Duke Color Palette](https://styleguide.duke.edu/color-palette/) = hegge-duke.css]
+]]]
+
+---
+
+## Coloured content boxes
+
+Use `.content-box-blue` (or gray/grey, duke-green, green, purple, red, or yellow) to produce a box with coloured background. Size depends on content.
+
+`.content-box-blue[I feel blue]` yields
+
+.content-box-blue[I feel blue]
+
+Wrap in `.full-width` to expand the width
+
+.full-width[.content-box-red[I feel wide and red]]
+
+If you have content in columns then you get
+
+.pull-left[.full-width[.content-box-yellow[**WARNING** Look out for minons or bananas]]]
+.pull-right[.full-width[.content-box-yellow[The box to the left was created using `.pull-left[.full-width[.content-box-yellow[]]]`]]]
+
+
+---
+
+## Coloured content boxes
+
+Use `.content-box-blue` to produce a box with blue background. Size depends on content.  color has the following options:  `.content-box-color` where color is   blue | gray | grey | neutral | duke-green | green | purple | red | yellow
+
+&nbsp;
+
+.content-box-blue[blue]
+.content-box-gray[gray]
+.content-box-grey[grey]
+.content-box-neutral[neutral]
+
+&nbsp;
+
+.content-box-duke-green[duke-green]
+.content-box-green[green]
+.content-box-purple[purple]
+
+&nbsp; 
+
+.content-box-red[red]
+.content-box-yellow[yellow]
+
+
+---
+
+# CSS
+
+CSS is the key to managing the style of your slides.  The cascading style sheets (CSS) are declared in the yaml header.
+
+```yaml
+output:
+  xaringan::moon_reader:
+    css: ["default", "ubuntu-mono.css"]
+```
+
+.footnote[.content-box-green[- Slide #4 documents the styles used in this presentation
+- The next slide provides some information on customizing or accessing available themes]
+]
+---
+
+# CSS User-Contributed Themes
+
+User-contributed themes. A theme typically consists of two CSS files `foo.css` and `foo-fonts.css`, where `foo` is the theme name. Below are some existing themes:
+
+```{r}
+names(xaringan:::list_css())
+```
+
+To use a theme, you can specify the `css` option as an array of CSS filenames (without the `.css` extensions), e.g.,
+
+```yaml
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+```
+
+If you want to contribute a theme to **xaringan**, please read [this blog post](https://yihui.name/en/2017/10/xaringan-themes).
+
+---
+class: duke-orange
+# Figure Captions
+
+<figure>
+  <img src="https://c1.staticflickr.com/5/4095/4735322270_29f2a170bb_n.jpg">
+    <figcaption> Image Credit:  
+      <a href="https://www.flickr.com/photos/wordridden/4735322270/in/photolist-8drLkq-646eKc-nG7uhG-quFpgc-4ucjnx-fe82eN-dYBniL-dYvFA4-9Cf4eR-6EGeNs-6HTKQj-65AZMK-fWBnJR-7xRE6a-6hXAvM-piV5xr-89EMot-6Ea5Ks-dPGTJM-dxKznu-6PLmRW-3YRkU8-5iq1tD-fmHnyr-iiLdJL-e5r9bR-5fAPht-8arifu-oBFJHP-fHytwE-7m3YaS-vKsn9-cMyqho-cNg979-gMG6Ng-6ox1FA-2MHsz8-c9LomS-bq7wvo-nt5ipG-rZ5GFD-duEHPx-pgTp2N-8mzmRJ-67XBkZ-ewrn88-b39pr2-6vRoKp-6mZfyi-6DxVuk">Salad Onions</a> by Jessica Spengler 
+    </figcaption>
+</figure>
+
+.justify-left[
+``` html
+<figure>
+  <img src="foo.png">
+    <figcaption> Image Credit: foo text here </figcaption>
+</figure>
+
+# Must declare figure-captions in the YAML header
+# Must use HTML instead of RMarkdown
+
+```
+]
+
+---
+exclude: false
+class: center, middle
+background-image: url(https://blogs.library.duke.edu/magazine/files/2010/12/duke-university-libraries-logo.jpg)
+<!-- https://commons.wikimedia.org/wiki/File:Duke_University_logo.svg -->
+<!-- https://blogs.library.duke.edu/magazine/files/2010/12/duke-university-libraries-logo.jpg -->
+<!-- http://library.duke.edu/data/sites/default/files/datagis/images/data_gis_logo.png -->
+
+<!-- HTML comment can go here  -->
+  
+???
+
+Presenter Notes go here
+use 'p' to toggle the presenter mode or '?' or 'h' to toggle the help / key-shortcut options
+
+Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Duke_University_logo.svg)
+
+
+---
+class: inverse, middle, center
+
+# More xaringan Documentation
+
+---
+
+# xaringan
+
+Provides an R Markdown output format `xaringan::moon_reader` as a wrapper for remark.js, and you can use it in the YAML metadata, e.g.
+
+```yaml
+---
+title: "A Cool Presentation"
+output:
+  xaringan::moon_reader
+    yolo: true
+    nature:
+      autoplay: 30000
+---
+```
+
+See the help page `?xaringan::moon_reader` for all possible options that you can use.
+
+---
+
+# using **xaringan** 
+
+.pull-right[
+1. Start with an R Markdown document;
+
+1. R Markdown (can embed R/other code chunks);
+
+1. Provide an option `autoplay`;
+
+1. MathJax just works;<sup>*</sup>
+
+1. Highlight code with `{{}}`;
+
+1. The RStudio addin "Infinite Moon Reader" automatically refreshes slides on changes;
+]
+
+.footnote[[*] Not really. See next page.]
+
+---
+
+# Math Expressions
+
+You can write LaTeX math expressions inside a pair of dollar signs, e.g. &#36;\alpha+\beta$ renders $\alpha+\beta$. You can use the display style with double dollar signs:
+
+```
+$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
+```
+
+$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
+
+Limitations:
+
+1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
+
+1. There should not be spaces after the opening `$` or before the closing `$`.
+
+1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
+
+---
+
+# R Plots
+
+```{r include=FALSE}
+fit = lm(dist ~ 1 + speed, data = cars)
+coef(summary(fit))
+dojutsu = c('地爆天星', '天照', '加具土命', '神威', '須佐能乎', '無限月読')
+grep('天', dojutsu, value = TRUE)
+```
+
+
+```{r cars, fig.height=4, dev='svg'}
+# visualizations are cool, duh.
+
+par(mar = c(4, 4, 1, .1))
+plot(cars, pch = 19, col = 'darkgray', las = 1)
+abline(fit, lwd = 2)
+```
+
+
+---
+
+# Tables
+
+If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
+
+```{r}
+knitr::kable(head(iris), format = 'html')
+```
+
+---
+### more HTML (kable) table
+```{r include=FALSE}
+library(magrittr)
+library(kableExtra)
+```
+
+```{r include=FALSE}
+text_tbl <- data.frame(
+  Items = c("Item 1", "Item 2", "Item 3"),
+  Features = c(
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vehicula tempor ex. Morbi malesuada sagittis turpis, at venenatis nisl luctus a. ",
+    "In eu urna at magna luctus rhoncus quis in nisl. Fusce in velit varius, posuere risus et, cursus augue. Duis eleifend aliquam ante, a aliquet ex tincidunt in. ", 
+    "Vivamus venenatis egestas eros ut tempus. Vivamus id est nisi. Aliquam molestie erat et sollicitudin venenatis. In ac lacus at velit scelerisque mattis. "
+  )
+)
+```
+```{r echo=FALSE}
+kable(text_tbl, "html") %>%
+  kable_styling(full_width = F, bootstrap_options = c("striped", "hover")) %>%
+  column_spec(1, bold = T, border_right = T) %>%
+  column_spec(2, width = "30em", background = "yellow") %>% 
+  row_spec(3, bold = T, color = "white", background = "#D7261E") %>% 
+  column_spec(1, background = "white", color = "black")
+```
+
+### Kable HTML Documentation
+
+[Documentation](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html) for HTML (kable) tables via the `library(kableExtra)` package
+
+
+---
+
+# HTML Widgets
+
+
+```{r out.width='100%', fig.height=6, eval=require('leaflet')}
+library(leaflet)
+leaflet() %>% addTiles() %>% setView(-93.65, 42.0285, zoom = 17)
+```
+
+---
+
+```{r eval=require('DT'), tidy=FALSE}
+DT::datatable(
+  head(iris, 10),
+  fillContainer = FALSE, options = list(pageLength = 8)
+)
+```
+
+---
+
+# Highlight Code
+
+- The option `highlightLines: true` of `nature` will highlight code lines that start with `*`, or are wrapped in `{{ }}`, or have trailing comments `#<<`;
+
+```yaml
+output:
+  xaringan::moon_reader:
+    nature:
+      highlightLines: true
+```
+
+
+See examples on the next page.
+
+---
+
+# Highlight Code with * or `{{}}`
+
+
+.pull-left[
+An example using a leading `*`:
+
+```r
+if (TRUE) {
+** message("Very important!")
+}
+```
+Output:
+```r
+if (TRUE) {
+* message("Very important!")
+}
+```
+
+This is invalid R code, so it is a plain fenced code block that is not executed.
+]
+
+.pull-right[
+An example using `{{}}`:
+
+`r ''````{r tidy=FALSE}
+if (TRUE) {
+*{{ message("Very important!") }}
+}
+```
+
+Output:
+```{r tidy=FALSE}
+if (TRUE) {
+{{ message("Very important!") }}
+}
+```
+
+It is valid R code so you can run it. Note that `{{}}` can wrap an R expression of multiple lines.
+]
+
+---
+
+# Highlight with trailing `#<<`
+
+An example of using the trailing comment `#<<` to highlight lines:
+
+``` r
+library(ggplot2)
+ggplot(mtcars) + 
+  aes(mpg, disp) + 
+  geom_point() +   #<<
+  geom_smooth()    #<<
+```
+
+
+Output:
+
+```{r tidy=FALSE, eval=FALSE}
+library(ggplot2)
+ggplot(mtcars) + 
+  aes(mpg, disp) + 
+  geom_point() +   #<<
+  geom_smooth()    #<<
+```
+
+---
+
+# Selected xaringan documentation links
+
+1. [xaringan documentation](https://slides.yihui.name/xaringan/)
+
+    - [xarigan wiki](https://github.com/yihui/xaringan/wiki)
+
+1. [hegge CSS](http://biostatistics.dk/presentations/xaringan/ghoul.html)
+
+1. [incrementing slides, layouts, template, place holders](https://slides.yihui.name/xaringan/incremental.html)
+
+1. [remark.js documentation](https://remarkjs.com) library;
+
+
+
+
+---
+
+# John Little
+
+&nbsp;
+
+.pull-left[.full-width[.content-box-green[
+### Data Analytics Librarian
+
+- https://johnlittle.info/
+
+- https://github.com/libjohn
+]]
+
+### Rfun host...
+You can make **Rfun** with our resources for R and data science analytics.  See the [R we having fun yet‽](https://rfun.library.duke.edu/) resource pages.
+]
+
+.pull-right[.content-box-grey[
+### Duke University
+
+**Data & Visualization Services**
+
+- https://library.duke.edu/data/
+- askData@Duke.edu
+- The /Edge, Bostock (1st Floor)
+- [Past Workshops](https://library.duke.edu/data/news/past-workshops)
+- [Guides & Tutorials](https://library.duke.edu/data/tutorials)
+
+]]
+
+
+
+
+---
+class: center, middle
+## Shareable 
+
+Data, presentation, and handouts 
+
+<span class="cc">
+<!-- Key: a: SA, b: BY, c: CC Circle, d: ND, n: NC, m: Sampling, s: Share, r: Remix, C: CC Full Logo -->
+C bn
+</span>
+
+
+[CC BY-NC license](https://creativecommons.org/licenses/by-nc/4.0/)
+
+

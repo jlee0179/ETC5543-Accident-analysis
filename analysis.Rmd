@@ -20,6 +20,7 @@ library(lubridate)
 library(parsnip)
 library(plotly)
 library(randomForest)
+library(randomForestExplainer)
 library(rsample)
 library(rstatix)
 library(tidyverse)
@@ -595,9 +596,9 @@ tmp_tash <- incidents %>%
   ))
 
 head(tmp_tash)
-model_fit <- lm(binary_outcome ~ age_group, data=tmp_tash) #double check this is logistic regression, not linear regression
+model_fit <- glm(binary_outcome ~ age_group, data=tmp_tash, family = "binomial") #double check this is logistic regression, not linear regression
 summary(model_fit)
-# find anova function that gives p value breakdown - something like summary.aov()
+# find anova function that gives p value breakdown - something like 
 ```
 
 ```{r}
@@ -943,11 +944,12 @@ nsw_fit_tr <- training(nsw_fit_split) %>%
   mutate(Temperature = as.numeric(Temperature))
 nsw_fit_ts <- testing(nsw_fit_split)
 
-down_train <- downSample(x = nsw_fit_tr[, -ncol(nsw_fit_tr)],
-                         y = nsw_fit_tr$incident_indicator)
-table(down_train$incident_indicator)   
+up_train <- upSample(x = nsw_fit_tr[, -ncol(nsw_fit_tr)],
+                     y = nsw_fit_tr$incident_indicator)                         
+table(up_train$Class) 
 
-nsw_fit_rf <- randomForest(incident_indicator ~ shift_hour_of_day+shift_hour_for_driver+Temperature+Precipitation, data = down_train, importance = TRUE)
+
+nsw_fit_rf <- randomForest(incident_indicator ~ shift_hour_of_day+shift_hour_for_driver+Temperature+Precipitation, data = up_train, importance = TRUE)
 print(nsw_fit_rf)
 
 test_model <- lm(incident_indicator ~ shift_hour_of_day + shift_hour_for_driver + Temperature + Precipitation, data=down_train)
@@ -961,11 +963,13 @@ nsw_fit_ts_pred <- nsw_fit_ts %>%
 
 table(actual = nsw_fit_ts$incident_indicator, predicted = nsw_fit_ts_pred$.pred)
 
-table(nsw_fit_tr$incident_indicator)
+table(up_train$incident_indicator)
 1689/(1689+40033)
 
 importance(nsw_fit_rf)
 varImpPlot(nsw_fit_rf)
+plot_predict_interaction(nsw_fit_rf, up_train, "shift_hour_of_day", "shift_hour_for_driver")
+plot_predict_interaction(nsw_fit_rf, up_train, "Temperature", "Precipitation")
 ```
 
 Mean Decrease Accuracy: How much the model accuracy decreases if we drop that variable.

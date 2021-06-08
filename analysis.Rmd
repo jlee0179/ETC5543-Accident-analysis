@@ -21,6 +21,7 @@ library(parsnip)
 library(plotly)
 library(randomForest)
 library(rsample)
+library(rstatix)
 library(tidyverse)
 ```
 
@@ -118,7 +119,9 @@ sydneyweather <- sydneyweather %>%
 
 ### Questions:
 
-1. How are drivers' characteristics (Depot, gender and age) affecting the incidents? Which is contributing the most incidents?
+1. How are drivers' characteristics (Depot, gender and age) affecting the incidents? Which is contributing the most incidents?'
+
+How are drivers' characteristics (Depot, gender and age) affecting the incidents? Is there 
 
 
 ```{r}
@@ -348,6 +351,8 @@ tidy(CLTest_gen)
 ```
 0.02 < 0.05 Reject the null hypothesis. The data provides strong evidence that gender does have an effect on incidents.
 
+
+
 ### Age
 
 ```{r}
@@ -552,6 +557,64 @@ tidy(CLTest_age)
 ```
 
 Driver's age doesn't explain much of the occurrence of incidents.
+
+```{r}
+age_mva_inc1 <- incidents %>%
+  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears(),
+         driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes"))
+age_mva_inc1$driver_age <- round(age_mva_inc1$driver_age, digits = 0)
+yo_70_inc <- age_mva_inc1 %>%
+  mutate(age_group = case_when(driver_age < 70 ~ "Younger than 70",
+                               driver_age >= 70 ~ "Older than 70")) %>%
+  group_by(age_group, driver_incident, EmployeeID) %>%
+  summarise(driver_age_group = n_distinct(EmployeeID)) %>%
+  group_by(age_group, driver_incident) %>%
+  summarise(num_drvage_inc = sum(driver_age_group))
+
+tot_drv_age1 <- driver_info %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears())
+
+tot_drv_age1$driver_age <- round(tot_drv_age1$driver_age, digits = 0)
+
+tot_drv_age1 <- tot_drv_age1 %>%
+  mutate(age_group = case_when(driver_age < 70 ~ "Younger than 70",
+                               driver_age >= 70 ~ "Older than 70")) %>%
+  distinct(EmployeeID, age_group) %>%
+  group_by(age_group) %>%
+  summarise(num_of_drvr = n())
+
+yo70_inc_tab <- yo_70_inc %>%
+  pivot_wider(names_from = driver_incident, values_from = num_drvage_inc) %>%
+  left_join(tot_drv_age1, by = "age_group") %>%
+  mutate(has_incident_age = (Yes/num_of_drvr)*100) %>%
+  mutate(across(has_incident_age, round, 2)) %>%
+  rename(`age group` = age_group, incident = Yes, `no incident` = No, total = num_of_drvr, prop = has_incident_age) 
+
+
+yo70_inc_tab %>%
+  kable() %>%
+  kable_styling()
+```
+
+```{r}
+test_x2 <- as.matrix(yo70_inc_tab %>%
+                      ungroup() %>%
+                      select(incident, `no incident`))
+CLTest_yo70 <- prop.test(test_x2)
+tidy(CLTest_yo70)
+```
+
+```{r}
+res.aov <- age_inc_tab %>% anova_test(prop ~ `age group`)
+res.aov
+```
 
 2. On what day have most incidents been found? Which hours are the peak and trough?
 

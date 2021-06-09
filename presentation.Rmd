@@ -26,6 +26,7 @@ options(htmltools.dir.version = FALSE)
 library(base)
 library(broom)
 library(caret)
+library(citation)
 library(ggridges)
 library(hrbrthemes)
 library(kableExtra)
@@ -1116,6 +1117,59 @@ plot_predict_interaction(nsw_fit_rf, up_train, "shift_hour_of_day", "shift_hour_
 ```{r echo=FALSE, fig.dim=c(12,8)}
 plot_predict_interaction(nsw_fit_rf, up_train, "Temperature", "Precipitation")
 ```
+
+---
+
+class: middle
+
+# References:
+
+.tiny[
+Alboukadel Kassambara (2021). rstatix: Pipe-Friendly Framework for Basic Statistical Tests.
+  R package version 0.7.0. https://CRAN.R-project.org/package=rstatix
+
+Aleksandra Paluszynska, Przemyslaw Biecek and Yue Jiang (2020). randomForestExplainer:
+  Explaining and Visualizing Random Forests in Terms of Variable Importance. R package version
+  0.10.1. https://CRAN.R-project.org/package=randomForestExplainer
+
+A. Liaw and M. Wiener (2002). Classification and Regression by randomForest. R News 2(3),
+  18--22.
+
+Bob Rudis (2020). hrbrthemes: Additional Themes, Theme Components and Utilities for
+  'ggplot2'. R package version 0.8.0. https://CRAN.R-project.org/package=hrbrthemes
+
+Claus O. Wilke (2021). ggridges: Ridgeline Plots in 'ggplot2'. R package version 0.5.3.
+  https://CRAN.R-project.org/package=ggridges
+  
+C. Sievert. Interactive Web-Based Data Visualization with R, plotly, and shiny. Chapman and
+  Hall/CRC Florida, 2020.
+
+David Robinson, Alex Hayes and Simon Couch (2021). broom: Convert Statistical Objects into
+  Tidy Tibbles. R package version 0.7.5. https://CRAN.R-project.org/package=broom
+
+Garrett Grolemund, Hadley Wickham (2011). Dates and Times Made Easy with lubridate. Journal
+  of Statistical Software, 40(3), 1-25. URL https://www.jstatsoft.org/v40/i03/.
+
+Hao Zhu (2021). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R package
+  version 1.3.4. https://CRAN.R-project.org/package=kableExtra
+
+Julia Silge, Fanny Chow, Max Kuhn and Hadley Wickham (2021). rsample: General Resampling
+  Infrastructure. R package version 0.0.9. https://CRAN.R-project.org/package=rsample
+
+Max Kuhn and Davis Vaughan (2021). parsnip: A Common API to Modeling and Analysis Functions.
+  R package version 0.1.5. https://CRAN.R-project.org/package=parsnip
+
+Max Kuhn (2020). caret: Classification and Regression Training. R package version 6.0-86.
+  https://CRAN.R-project.org/package=caret
+
+R Core Team (2021). R: A language and environment for statistical computing. R Foundation
+  for Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.
+  
+Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43),
+  1686, https://doi.org/10.21105/joss.01686
+
+]
+
 ---
 
 class: inverse, center, middle

@@ -12,22 +12,6 @@
     <link href="libs/remark-css/hygge-duke.css" rel="stylesheet" />
     <script src="libs/kePrint/kePrint.js"></script>
     <link href="libs/lightable/lightable.css" rel="stylesheet" />
-    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
-    <script src="libs/jquery/jquery.min.js"></script>
-    <link href="libs/leaflet/leaflet.css" rel="stylesheet" />
-    <script src="libs/leaflet/leaflet.js"></script>
-    <link href="libs/leafletfix/leafletfix.css" rel="stylesheet" />
-    <script src="libs/proj4/proj4.min.js"></script>
-    <script src="libs/Proj4Leaflet/proj4leaflet.js"></script>
-    <link href="libs/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
-    <script src="libs/leaflet-binding/leaflet.js"></script>
-    <link href="libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
-    <script src="libs/datatables-binding/datatables.js"></script>
-    <link href="libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
-    <link href="libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
-    <script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
-    <link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
-    <script src="libs/crosstalk/js/crosstalk.min.js"></script>
     <link rel="stylesheet" href="libs/cc-fonts.css" type="text/css" />
     <link rel="stylesheet" href="libs/figure-captions.css" type="text/css" />
   </head>
@@ -119,13 +103,13 @@ class: middle, center
 
 ---
 
-# Drivers had claims by **depot** (%) 
+## Drivers had claims by **depot** (%) 
 
 ![](presentation_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
 
 ---
 
-# Drivers had claims by **depot** (%), classified with incidents severity
+## Drivers had claims by **depot** (%), classified with incidents severity
 
 
 
@@ -133,13 +117,13 @@ class: middle, center
 
 ---
 
-# Drivers had claims by **gender** (%), classified by company 
+## Drivers had claims by **gender** (%), classified by company 
 
 ![](presentation_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
 
 ---
 
-# Drivers had claims by **gender** (%), classified with incidents severity
+## Drivers had claims by **gender** (%), classified with incidents severity
 
 
 
@@ -147,7 +131,7 @@ class: middle, center
 
 ---
 
-# Gender vs MVA Incident T-test
+## Gender vs MVA Incident T-test
 
 
 &lt;style type="text/css"&gt;
@@ -226,12 +210,12 @@ class: middle, center
 
 ---
 
-# Drivers had claims by **age** (%) 
+## Drivers had claims by **age** (%) 
 
 ![](presentation_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
 
 ---
-# Drivers had claims by **age** (%), classified with incidents severity
+## Drivers had claims by **age** (%), classified with incidents severity
 
 
 
@@ -239,7 +223,7 @@ class: middle, center
 
 ---
 
-# Age vs MVA Incident ANOVA Test
+## Age vs MVA Incident ANOVA Test
 
 &lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
 &lt;caption&gt;Contingency table for age and incident&lt;/caption&gt;
@@ -307,8 +291,15 @@ class: middle, center
 
 ---
 
-# Age vs MVA Incident ANOVA Test
+## Age vs MVA Incident ANOVA Test
 
+
+
+.scrollable-slide[
+
+```r
+summary(model_fit) 
+```
 
 ```
 ## 
@@ -340,10 +331,11 @@ class: middle, center
 ## 
 ## Number of Fisher Scoring iterations: 4
 ```
+]
 
 ---
 
-# Age (before &amp; after 70) vs MVA Incident T-Test
+## Age (before &amp; after 70) vs MVA Incident T-Test
 
 &lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
 &lt;caption&gt;Contingency table for age (before &amp;amp; after 70) and incident&lt;/caption&gt;
@@ -412,570 +404,177 @@ class: middle, center
 
 ---
 
-# Tuesdays have the most claims, Sundays have the least
+## Most claims on Tuesdays, least on Sundays
+
+![](presentation_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+
+---
+
+## Most claims at peak hours for weekdays, at 3-4pm for weekends
+
+![](presentation_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+
+---
+
+class: middle, center
+
+.full-width[.content-box-duke-green[3) Is it more dangerous for the bus to travel at night or during the daytime?]]
+
+---
+
+## 5 times more claims made during daytime
+
+![](presentation_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+
+---
+
+class: middle, center
+
+.full-width[.content-box-duke-green[4) What kind of weather (temperature and precipitation) is considered safer or dangerous for bus drivers?]]
+
+---
+
+## Most incidents found with rainfall from 1.5 to 4.5 (mm)
+
+![](presentation_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+
+---
+
+## Most incidents found with rainfall close to 0
+
+![](presentation_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+
+---
+
+## log scale distribution under little/no rain and rainy condition (not normally distributed)
+
+
+
+![](presentation_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+
+---
+
+## Rain condition vs incidents Wilcox test 
 
 
 ```r
-incidents %&gt;%
-  drop_na(EmployeeNumber) %&gt;%
-  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %&gt;%
-  mutate(day_week = weekdays(as.Date(DateOccurred))) %&gt;%
-  group_by(day_week) %&gt;%
-  summarise(total_cases = n()) %&gt;%
-  ggplot(aes(x = factor(day_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")), total_cases)) +
-  geom_bar(stat = "identity", fill = "skyblue") +
-  geom_text(aes(label=total_cases), vjust=1.6, color="white", size=3.5)+
-    theme_minimal() +
-  labs(y = "Total claim number", x = "Day", title = "Total claim by day of the week")
+wilcox.test(Precipitation ~ has_incident, data = rain_inc)
 ```
 
-![](presentation_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
-
----
-
-# Modifying text
-
-.pull-left[
-
-## Font sizes
-
-This is normal size ( `\(\LaTeX\)`-friendly terms)
-
-.Large[Large]
-
-.large[large]
-
-.small[small]
-
-.footnotesize[footnotesize]
-
-.scriptsize[scriptsize]
-
-.tiny[tiny]
-
-]
-
-.pull-right[
-
-## Text color
-
-.black[black]
-
-.red[red]
-
-.blue[blue]
-
-.green[green], 
-.yellow[yellow], 
-.orange[orange], 
-.purple[purple], 
-.gray[gray or grey]
-
-You can also use `.bold[]` or `.bolder[]` to emphasize text 
-
-This is .bold[bold], this is .bolder[bolder] and this is regular markdown **double-star bold** (visible differences depend on the font)
-
-]
-
-.content-box-green[.scriptsize[.justify-center[
-[Hegge CSS](http://biostatistics.dk/presentations/xaringan/ghoul.html) + [Duke Color Palette](https://styleguide.duke.edu/color-palette/) = hegge-duke.css]
-]]]
-
----
-
-## Coloured content boxes
-
-Use `.content-box-blue` (or gray/grey, duke-green, green, purple, red, or yellow) to produce a box with coloured background. Size depends on content.
-
-`.content-box-blue[I feel blue]` yields
-
-.content-box-blue[I feel blue]
-
-Wrap in `.full-width` to expand the width
-
-.full-width[.content-box-red[I feel wide and red]]
-
-If you have content in columns then you get
-
-.pull-left[.full-width[.content-box-yellow[**WARNING** Look out for minons or bananas]]]
-.pull-right[.full-width[.content-box-yellow[The box to the left was created using `.pull-left[.full-width[.content-box-yellow[]]]`]]]
-
-
----
-
-## Coloured content boxes
-
-Use `.content-box-blue` to produce a box with blue background. Size depends on content.  color has the following options:  `.content-box-color` where color is   blue | gray | grey | neutral | duke-green | green | purple | red | yellow
-
-&amp;nbsp;
-
-.content-box-blue[blue]
-.content-box-gray[gray]
-.content-box-grey[grey]
-.content-box-neutral[neutral]
-
-&amp;nbsp;
-
-.content-box-duke-green[duke-green]
-.content-box-green[green]
-.content-box-purple[purple]
-
-&amp;nbsp; 
-
-.content-box-red[red]
-.content-box-yellow[yellow]
-
-
----
-
-# CSS
-
-CSS is the key to managing the style of your slides.  The cascading style sheets (CSS) are declared in the yaml header.
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: ["default", "ubuntu-mono.css"]
 ```
-
-.footnote[.content-box-green[- Slide #4 documents the styles used in this presentation
-- The next slide provides some information on customizing or accessing available themes]
-]
----
-
-# CSS User-Contributed Themes
-
-User-contributed themes. A theme typically consists of two CSS files `foo.css` and `foo-fonts.css`, where `foo` is the theme name. Below are some existing themes:
-
+## 
+## 	Wilcoxon rank sum test with continuity correction
+## 
+## data:  Precipitation by has_incident
+## W = 214401310, p-value = 0.05974
+## alternative hypothesis: true location shift is not equal to 0
+```
 
 ```r
-names(xaringan:::list_css())
-```
-
-```
-##  [1] "chocolate-fonts"  "chocolate"        "default-fonts"    "default"         
-##  [5] "duke-blue"        "fc-fonts"         "fc"               "hygge-duke"      
-##  [9] "hygge"            "ki-fonts"         "ki"               "kunoichi"        
-## [13] "lucy-fonts"       "lucy"             "metropolis-fonts" "metropolis"      
-## [17] "middlebury-fonts" "middlebury"       "nhsr-fonts"       "nhsr"            
-## [21] "ninjutsu"         "rladies-fonts"    "rladies"          "robot-fonts"     
-## [25] "robot"            "rutgers-fonts"    "rutgers"          "shinobi"         
-## [29] "tamu-fonts"       "tamu"             "uio-fonts"        "uio"             
-## [33] "uo-fonts"         "uo"               "uol-fonts"        "uol"             
-## [37] "useR-fonts"       "useR"
-```
-
-To use a theme, you can specify the `css` option as an array of CSS filenames (without the `.css` extensions), e.g.,
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: [default, metropolis, metropolis-fonts]
-```
-
-If you want to contribute a theme to **xaringan**, please read [this blog post](https://yihui.name/en/2017/10/xaringan-themes).
-
----
-class: duke-orange
-# Figure Captions
-
-&lt;figure&gt;
-  &lt;img src="https://c1.staticflickr.com/5/4095/4735322270_29f2a170bb_n.jpg"&gt;
-    &lt;figcaption&gt; Image Credit:  
-      &lt;a href="https://www.flickr.com/photos/wordridden/4735322270/in/photolist-8drLkq-646eKc-nG7uhG-quFpgc-4ucjnx-fe82eN-dYBniL-dYvFA4-9Cf4eR-6EGeNs-6HTKQj-65AZMK-fWBnJR-7xRE6a-6hXAvM-piV5xr-89EMot-6Ea5Ks-dPGTJM-dxKznu-6PLmRW-3YRkU8-5iq1tD-fmHnyr-iiLdJL-e5r9bR-5fAPht-8arifu-oBFJHP-fHytwE-7m3YaS-vKsn9-cMyqho-cNg979-gMG6Ng-6ox1FA-2MHsz8-c9LomS-bq7wvo-nt5ipG-rZ5GFD-duEHPx-pgTp2N-8mzmRJ-67XBkZ-ewrn88-b39pr2-6vRoKp-6mZfyi-6DxVuk"&gt;Salad Onions&lt;/a&gt; by Jessica Spengler 
-    &lt;/figcaption&gt;
-&lt;/figure&gt;
-
-.justify-left[
-``` html
-&lt;figure&gt;
-  &lt;img src="foo.png"&gt;
-    &lt;figcaption&gt; Image Credit: foo text here &lt;/figcaption&gt;
-&lt;/figure&gt;
-
-# Must declare figure-captions in the YAML header
-# Must use HTML instead of RMarkdown
-
-```
-]
-
----
-exclude: false
-class: center, middle
-background-image: url(https://blogs.library.duke.edu/magazine/files/2010/12/duke-university-libraries-logo.jpg)
-&lt;!-- https://commons.wikimedia.org/wiki/File:Duke_University_logo.svg --&gt;
-&lt;!-- https://blogs.library.duke.edu/magazine/files/2010/12/duke-university-libraries-logo.jpg --&gt;
-&lt;!-- http://library.duke.edu/data/sites/default/files/datagis/images/data_gis_logo.png --&gt;
-
-&lt;!-- HTML comment can go here  --&gt;
-  
-???
-
-Presenter Notes go here
-use 'p' to toggle the presenter mode or '?' or 'h' to toggle the help / key-shortcut options
-
-Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Duke_University_logo.svg)
-
-
----
-class: inverse, middle, center
-
-# More xaringan Documentation
-
----
-
-# xaringan
-
-Provides an R Markdown output format `xaringan::moon_reader` as a wrapper for remark.js, and you can use it in the YAML metadata, e.g.
-
-```yaml
----
-title: "A Cool Presentation"
-output:
-  xaringan::moon_reader
-    yolo: true
-    nature:
-      autoplay: 30000
----
-```
-
-See the help page `?xaringan::moon_reader` for all possible options that you can use.
-
----
-
-# using **xaringan** 
-
-.pull-right[
-1. Start with an R Markdown document;
-
-1. R Markdown (can embed R/other code chunks);
-
-1. Provide an option `autoplay`;
-
-1. MathJax just works;&lt;sup&gt;*&lt;/sup&gt;
-
-1. Highlight code with `{{}}`;
-
-1. The RStudio addin "Infinite Moon Reader" automatically refreshes slides on changes;
-]
-
-.footnote[[*] Not really. See next page.]
-
----
-
-# Math Expressions
-
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &amp;#36;\alpha+\beta$ renders `\(\alpha+\beta\)`. You can use the display style with double dollar signs:
-
-```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-```
-
-`$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$`
-
-Limitations:
-
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
-
-1. There should not be spaces after the opening `$` or before the closing `$`.
-
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
-
----
-
-# R Plots
-
-
-
-
-
-```r
-# visualizations are cool, duh.
-
-par(mar = c(4, 4, 1, .1))
-plot(cars, pch = 19, col = 'darkgray', las = 1)
-abline(fit, lwd = 2)
-```
-
-![](presentation_files/figure-html/cars-1.svg)&lt;!-- --&gt;
-
-
----
-
-# Tables
-
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
-
-
-```r
-knitr::kable(head(iris), format = 'html')
-```
-
-&lt;table&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:right;"&gt; Sepal.Length &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; Sepal.Width &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; Petal.Length &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; Petal.Width &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Species &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 5.1 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.5 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.4 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 4.9 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.0 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.4 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 4.7 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.2 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 4.6 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.1 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.5 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 5.0 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.6 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.4 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.2 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 5.4 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3.9 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1.7 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.4 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; setosa &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
----
-### more HTML (kable) table
-
-
-
-&lt;table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; Items &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Features &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;font-weight: bold;border-right:1px solid;color: black !important;background-color: white !important;"&gt; Item 1 &lt;/td&gt;
-   &lt;td style="text-align:left;width: 30em; background-color: yellow !important;"&gt; Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vehicula tempor ex. Morbi malesuada sagittis turpis, at venenatis nisl luctus a. &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;font-weight: bold;border-right:1px solid;color: black !important;background-color: white !important;"&gt; Item 2 &lt;/td&gt;
-   &lt;td style="text-align:left;width: 30em; background-color: yellow !important;"&gt; In eu urna at magna luctus rhoncus quis in nisl. Fusce in velit varius, posuere risus et, cursus augue. Duis eleifend aliquam ante, a aliquet ex tincidunt in. &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;font-weight: bold;border-right:1px solid;font-weight: bold;color: white !important;background-color: #D7261E !important;color: black !important;background-color: white !important;"&gt; Item 3 &lt;/td&gt;
-   &lt;td style="text-align:left;width: 30em; background-color: yellow !important;font-weight: bold;color: white !important;background-color: #D7261E !important;"&gt; Vivamus venenatis egestas eros ut tempus. Vivamus id est nisi. Aliquam molestie erat et sollicitudin venenatis. In ac lacus at velit scelerisque mattis. &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
-### Kable HTML Documentation
-
-[Documentation](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html) for HTML (kable) tables via the `library(kableExtra)` package
-
-
----
-
-# HTML Widgets
-
-
-
-```r
-library(leaflet)
-leaflet() %&gt;% addTiles() %&gt;% setView(-93.65, 42.0285, zoom = 17)
-```
-
-```{=html}
-&lt;div id="htmlwidget-580fd17e2ec608d209c9" style="width:100%;height:432px;" class="leaflet html-widget"&gt;&lt;/div&gt;
-&lt;script type="application/json" data-for="htmlwidget-580fd17e2ec608d209c9"&gt;{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&amp;copy; &lt;a href=\"http://openstreetmap.org\"&gt;OpenStreetMap&lt;\/a&gt; contributors, &lt;a href=\"http://creativecommons.org/licenses/by-sa/2.0/\"&gt;CC-BY-SA&lt;\/a&gt;"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}&lt;/script&gt;
+# is associated, relationship
 ```
 
 ---
 
+## Most incidents found with moderate temperature
 
-```r
-DT::datatable(
-  head(iris, 10),
-  fillContainer = FALSE, options = list(pageLength = 8)
-)
+![](presentation_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
+
+---
+
+# Temperature vs incidents distribution (normally distributed)
+
+
+
+![](presentation_files/figure-html/unnamed-chunk-31-1.png)&lt;!-- --&gt;
+
+---
+
+## Temperature vs Incidents T-Test
+
+
 ```
-
-```{=html}
-&lt;div id="htmlwidget-081ba601f3ea135e100f" style="width:100%;height:auto;" class="datatables html-widget"&gt;&lt;/div&gt;
-&lt;script type="application/json" data-for="htmlwidget-081ba601f3ea135e100f"&gt;{"x":{"filter":"none","fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10"],[5.1,4.9,4.7,4.6,5,5.4,4.6,5,4.4,4.9],[3.5,3,3.2,3.1,3.6,3.9,3.4,3.4,2.9,3.1],[1.4,1.4,1.3,1.5,1.4,1.7,1.4,1.5,1.4,1.5],[0.2,0.2,0.2,0.2,0.2,0.4,0.3,0.2,0.2,0.1],["setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"&lt;table class=\"display\"&gt;\n  &lt;thead&gt;\n    &lt;tr&gt;\n      &lt;th&gt; &lt;\/th&gt;\n      &lt;th&gt;Sepal.Length&lt;\/th&gt;\n      &lt;th&gt;Sepal.Width&lt;\/th&gt;\n      &lt;th&gt;Petal.Length&lt;\/th&gt;\n      &lt;th&gt;Petal.Width&lt;\/th&gt;\n      &lt;th&gt;Species&lt;\/th&gt;\n    &lt;\/tr&gt;\n  &lt;\/thead&gt;\n&lt;\/table&gt;","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}&lt;/script&gt;
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  Temperature by has_incident
+## t = -31.11, df = 4322.5, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -3.292622 -2.902225
+## sample estimates:
+##  mean in group No mean in group Yes 
+##          16.63799          19.73542
 ```
 
 ---
 
-# Highlight Code
+class: middle, center
 
-- The option `highlightLines: true` of `nature` will highlight code lines that start with `*`, or are wrapped in `{{ }}`, or have trailing comments `#&lt;&lt;`;
-
-```yaml
-output:
-  xaringan::moon_reader:
-    nature:
-      highlightLines: true
-```
-
-
-See examples on the next page.
-
----
-
-# Highlight Code with * or `{{}}`
-
-
-.pull-left[
-An example using a leading `*`:
-
-```r
-if (TRUE) {
-** message("Very important!")
-}
-```
-Output:
-```r
-if (TRUE) {
-* message("Very important!")
-}
-```
-
-This is invalid R code, so it is a plain fenced code block that is not executed.
-]
-
-.pull-right[
-An example using `{{}}`:
-
-```{r tidy=FALSE}
-if (TRUE) {
-*{{ message("Very important!") }}
-}
-```
-
-Output:
-
-```r
-if (TRUE) {
-* message("Very important!") 
-}
-```
-
-```
-## Very important!
-```
-
-It is valid R code so you can run it. Note that `{{}}` can wrap an R expression of multiple lines.
-]
-
----
-
-# Highlight with trailing `#&lt;&lt;`
-
-An example of using the trailing comment `#&lt;&lt;` to highlight lines:
-
-``` r
-library(ggplot2)
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +   #&lt;&lt;
-  geom_smooth()    #&lt;&lt;
-```
-
-
-Output:
-
-
-```r
-library(ggplot2)
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-* geom_point() +
-* geom_smooth()
-```
-
----
-
-# Selected xaringan documentation links
-
-1. [xaringan documentation](https://slides.yihui.name/xaringan/)
-
-    - [xarigan wiki](https://github.com/yihui/xaringan/wiki)
-
-1. [hegge CSS](http://biostatistics.dk/presentations/xaringan/ghoul.html)
-
-1. [incrementing slides, layouts, template, place holders](https://slides.yihui.name/xaringan/incremental.html)
-
-1. [remark.js documentation](https://remarkjs.com) library;
-
-
+.full-width[.content-box-duke-green[5) Is there a relationship between drivers' driving hours within a day and the likelihood of getting into an incident?]]
 
 
 ---
 
-# John Little
+## Distribution of incidents &amp; Hour of driving classfied by day &amp; night
 
-&amp;nbsp;
-
-.pull-left[.full-width[.content-box-green[
-### Data Analytics Librarian
-
-- https://johnlittle.info/
-
-- https://github.com/libjohn
-]]
-
-### Rfun host...
-You can make **Rfun** with our resources for R and data science analytics.  See the [R we having fun yet‽](https://rfun.library.duke.edu/) resource pages.
-]
-
-.pull-right[.content-box-grey[
-### Duke University
-
-**Data &amp; Visualization Services**
-
-- https://library.duke.edu/data/
-- askData@Duke.edu
-- The /Edge, Bostock (1st Floor)
-- [Past Workshops](https://library.duke.edu/data/news/past-workshops)
-- [Guides &amp; Tutorials](https://library.duke.edu/data/tutorials)
-
-]]
-
-
-
+![](presentation_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
 
 ---
-class: center, middle
-## Shareable 
 
-Data, presentation, and handouts 
+## Random Forest
+
+
+
+
+```
+## 
+##     0     1 
+## 40033 40033
+```
+
+```
+## 
+## Call:
+##  randomForest(formula = incident_indicator ~ shift_hour_of_day +      shift_hour_for_driver + Temperature + Precipitation, data = up_train,      importance = TRUE) 
+##                Type of random forest: classification
+##                      Number of trees: 500
+## No. of variables tried at each split: 2
+## 
+##         OOB estimate of  error rate: 20.11%
+## Confusion matrix:
+##       0     1 class.error
+## 0 26989 13044  0.32583119
+## 1  3056 36977  0.07633702
+```
+
+---
+
+## Variables importance
+
+
+```
+##                               0        1 MeanDecreaseAccuracy MeanDecreaseGini
+## shift_hour_of_day     -4.012331 187.6727             254.6531         2544.702
+## shift_hour_for_driver -3.594799 159.4319             242.8338         2986.778
+## Temperature           -8.601131 161.9340             164.9366        10839.905
+## Precipitation          3.676644 308.9476             296.2928         1127.410
+```
+
+![](presentation_files/figure-html/unnamed-chunk-36-1.png)&lt;!-- --&gt;
+
+---
+
+![](presentation_files/figure-html/unnamed-chunk-37-1.png)&lt;!-- --&gt;
+
+---
+
+![](presentation_files/figure-html/unnamed-chunk-38-1.png)&lt;!-- --&gt;
+---
+
+class: inverse, center, middle
+# Thank you! 
+
 
 &lt;span class="cc"&gt;
 &lt;!-- Key: a: SA, b: BY, c: CC Circle, d: ND, n: NC, m: Sampling, s: Share, r: Remix, C: CC Full Logo --&gt;

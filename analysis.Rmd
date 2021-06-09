@@ -670,7 +670,7 @@ incidents %>%
 
 ```
 
-3. Has daytime or night been a significant cause of incidents?
+3. Is it more dangerous for the bus to travel at night or during the daytime?
 
 ```{r}
 daynight_incidents <- incidents %>%
@@ -794,59 +794,6 @@ ggplot(tmp2_when_occur, aes(x = diff_occur_start)) +
 FIT a model to predict incident, understand the relationship between variables. Random forest (suggested), can discover non-linear relationship, build tree diagrams, get variable importance. e.g. given an hour, is it going to be incident or not. variables e.g. gender, hour of driving, weather, time of day.
 
 ```{r}
-nswshifts_base <- nswshifts %>%
-  mutate(JoinDate = as.Date(VdsTripStartTime)) %>%
-  group_by(EmployeeID, JoinDate) %>%
-  summarise(shift_start = min(VdsTripStartTime)-30*60,
-  shift_end = max(VdsTripEndTime)+30*60)
-
-tmp2_mva <- tmp2 %>%
-  distinct(EmployeeID, ClaimCategoryName, DateOccurred, .keep_all = TRUE) %>%
-  filter(match_type == 2, str_starts(TypeOfClaimName, "MVA"))
-  
-nswshifts_drvhour <- nswshifts_base %>%
-  left_join(tmp2_mva, by = c("EmployeeID", "JoinDate", "shift_start", "shift_end")) %>%
-  mutate(drive_hour = difftime(shift_end, shift_start),
-         drive_hour = drive_hour/dhours(),
-         start_hour = hour(shift_start))
-         
-nswshifts_drvhour$drive_hour <- round(nswshifts_drvhour$drive_hour, digits = 0) 
-
-nswshifts_drvhour <- nswshifts_drvhour %>%
-  inner_join(driver_info %>%
-              select(EmployeeID, Gender), by = "EmployeeID") %>%
-  mutate(has_incident = case_when(is.na(ClaimNumber) ~ "No",
-                                         !is.na(ClaimNumber) ~ "Yes")) 
-nswshifts_drvhour <- nswshifts_drvhour %>%
-  select(drive_hour, start_hour, Gender, has_incident) %>%
-  ungroup() %>%
-  select(-EmployeeID) %>% 
-  mutate(Gender = case_when(Gender == "Male" ~ 1,
-                            Gender == "Female" ~ 0))
-
-
-
-set.seed(2021)
-nswshifts_drvhour <- nswshifts_drvhour %>%
-  mutate(has_incident = factor(has_incident)) 
-nswshifts_drvhour_split <- initial_split(nswshifts_drvhour, 2/3,
-                                         strata = has_incident)
-nswshifts_drvhour_tr <- training(nswshifts_drvhour_split)
-nswshifts_drvhour_ts <- testing(nswshifts_drvhour_split)
-
-nswshifts_drvhour_rf <- randomForest(has_incident~drive_hour+start_hour+Gender, data = nswshifts_drvhour_tr, importance = TRUE)
-
-#nswshifts_drvhour_ts$Gender <- factor(nswshifts_drvhour_ts$Gender, levels = levels(nswshifts_drvhour_tr$Gender))
-
-nswshifts_drvhour_ts_pred <- nswshifts_drvhour_ts %>%
-  mutate(.pred = predict(nswshifts_drvhour_rf, nswshifts_drvhour_ts))
-
-importance(nswshifts_drvhour_rf)
-
-
-```
-
-```{r}
 # fix the original random forest dataframe
 nswshifts1 <- nswshifts %>%
   rename(shift_start = VdsTripStartTime, shift_end = VdsTripEndTime) %>%
@@ -929,7 +876,6 @@ table(up_train$Class)
 nsw_fit_rf <- randomForest(incident_indicator ~ shift_hour_of_day+shift_hour_for_driver+Temperature+Precipitation, data = up_train, importance = TRUE)
 print(nsw_fit_rf)
 
-test_model <- lm(incident_indicator ~ shift_hour_of_day + shift_hour_for_driver + Temperature + Precipitation, data=down_train)
 
 nsw_fit_ts_pred <- nsw_fit_ts %>%
   mutate(.pred = predict(nsw_fit_rf, nsw_fit_ts, type = "prob"))
@@ -938,10 +884,8 @@ nsw_fit_ts_pred <- nsw_fit_ts %>%
 # train random forest on different error functions false positive rate or recall/precision
 
 
-table(actual = nsw_fit_ts$incident_indicator, predicted = nsw_fit_ts_pred$.pred)
 
 table(up_train$incident_indicator)
-1689/(1689+40033)
 
 importance(nsw_fit_rf)
 varImpPlot(nsw_fit_rf)

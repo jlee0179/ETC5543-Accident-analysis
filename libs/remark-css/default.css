@@ -70,8 +70,3 @@ th, td { padding: 5px; }
     left: 0 !important;
   }
 }
-
-.scrollable-slide {
-    height: 800px;
-    overflow-y: auto !important;
-}

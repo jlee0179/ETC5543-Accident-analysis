@@ -192,7 +192,7 @@ class: middle, center
 
 ---
 
-# Drivers had claims by **depot** (%) 
+## Drivers had claims by **depot** (%) 
 
 ```{r echo=FALSE, message=FALSE, fig.dim=c(12,8)}
 # all drivers in each depot
@@ -229,7 +229,7 @@ drvr_inc_dpt %>%
 
 ---
 
-# Drivers had claims by **depot** (%), classified with incidents severity
+## Drivers had claims by **depot** (%), classified with incidents severity
 
 ```{r echo=FALSE, message=FALSE}
 severity_inc <- incidents %>%
@@ -297,7 +297,7 @@ htmlwidgets::saveWidget(p1,paste0("p1.html"))
 
 ---
 
-# Drivers had claims by **gender** (%), classified by company 
+## Drivers had claims by **gender** (%), classified by company 
 
 ```{r echo=FALSE, message=FALSE, fig.dim=c(12,8)}
 drvr_inc_gdr <- incidents %>%
@@ -334,7 +334,7 @@ drvr_inc_gdr %>%
 
 ---
 
-# Drivers had claims by **gender** (%), classified with incidents severity
+## Drivers had claims by **gender** (%), classified with incidents severity
 
 ```{r echo=FALSE, message=FALSE}
 inc_severity_gdr <- severity_inc %>%
@@ -398,7 +398,7 @@ htmlwidgets::saveWidget(p2,paste0("p2.html"))
 
 ---
 
-# Gender vs MVA Incident T-test
+## Gender vs MVA Incident T-test
 
 
 ```{css, echo=F}
@@ -461,7 +461,7 @@ tidy(CLTest_gen) %>%
 
 ---
 
-# Drivers had claims by **age** (%) 
+## Drivers had claims by **age** (%) 
 
 ```{r echo=FALSE, message=FALSE, fig.dim=c(12,8)}
 inc_age <- incidents %>%
@@ -519,7 +519,7 @@ inc_age %>%
 ```
 
 ---
-# Drivers had claims by **age** (%), classified with incidents severity
+## Drivers had claims by **age** (%), classified with incidents severity
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 inc_severity_age <- severity_inc %>%
@@ -606,7 +606,7 @@ htmlwidgets::saveWidget(p3,paste0("p3.html"))
 
 ---
 
-# Age vs MVA Incident ANOVA Test
+## Age vs MVA Incident ANOVA Test
 
 ```{r echo=FALSE, message=FALSE}
 age_mva_inc <- incidents %>%
@@ -665,7 +665,7 @@ age_inc_tab %>%
 
 ---
 
-# Age vs MVA Incident ANOVA Test
+## Age vs MVA Incident ANOVA Test
 
 ```{r echo=FALSE}
 bin_age <- incidents %>%
@@ -703,7 +703,7 @@ summary(model_fit)
 
 ---
 
-# Age (before & after 70) vs MVA Incident T-Test
+## Age (before & after 70) vs MVA Incident T-Test
 
 ```{r echo=FALSE, message=FALSE}
 age_mva_inc1 <- incidents %>%
@@ -770,9 +770,9 @@ class: middle, center
 
 ---
 
-# Tuesdays have the most claims, Sundays have the least
+## Most claims on Tuesdays, least on Sundays
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.dim=c(12,8)}
 incidents %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
@@ -788,464 +788,342 @@ incidents %>%
 
 ---
 
-# Modifying text
+## Most claims at peak hours for weekdays, at 3-4pm for weekends
 
-.pull-left[
-
-## Font sizes
-
-This is normal size ( $\LaTeX$-friendly terms)
-
-.Large[Large]
-
-.large[large]
-
-.small[small]
-
-.footnotesize[footnotesize]
-
-.scriptsize[scriptsize]
-
-.tiny[tiny]
-
-]
-
-.pull-right[
-
-## Text color
-
-.black[black]
-
-.red[red]
-
-.blue[blue]
-
-.green[green], 
-.yellow[yellow], 
-.orange[orange], 
-.purple[purple], 
-.gray[gray or grey]
-
-You can also use `.bold[]` or `.bolder[]` to emphasize text 
-
-This is .bold[bold], this is .bolder[bolder] and this is regular markdown **double-star bold** (visible differences depend on the font)
-
-]
-
-.content-box-green[.scriptsize[.justify-center[
-[Hegge CSS](http://biostatistics.dk/presentations/xaringan/ghoul.html) + [Duke Color Palette](https://styleguide.duke.edu/color-palette/) = hegge-duke.css]
-]]]
-
----
-
-## Coloured content boxes
-
-Use `.content-box-blue` (or gray/grey, duke-green, green, purple, red, or yellow) to produce a box with coloured background. Size depends on content.
-
-`.content-box-blue[I feel blue]` yields
-
-.content-box-blue[I feel blue]
-
-Wrap in `.full-width` to expand the width
-
-.full-width[.content-box-red[I feel wide and red]]
-
-If you have content in columns then you get
-
-.pull-left[.full-width[.content-box-yellow[**WARNING** Look out for minons or bananas]]]
-.pull-right[.full-width[.content-box-yellow[The box to the left was created using `.pull-left[.full-width[.content-box-yellow[]]]`]]]
-
-
----
-
-## Coloured content boxes
-
-Use `.content-box-blue` to produce a box with blue background. Size depends on content.  color has the following options:  `.content-box-color` where color is   blue | gray | grey | neutral | duke-green | green | purple | red | yellow
-
-&nbsp;
-
-.content-box-blue[blue]
-.content-box-gray[gray]
-.content-box-grey[grey]
-.content-box-neutral[neutral]
-
-&nbsp;
-
-.content-box-duke-green[duke-green]
-.content-box-green[green]
-.content-box-purple[purple]
-
-&nbsp; 
-
-.content-box-red[red]
-.content-box-yellow[yellow]
-
-
----
-
-# CSS
-
-CSS is the key to managing the style of your slides.  The cascading style sheets (CSS) are declared in the yaml header.
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: ["default", "ubuntu-mono.css"]
-```
-
-.footnote[.content-box-green[- Slide #4 documents the styles used in this presentation
-- The next slide provides some information on customizing or accessing available themes]
-]
----
-
-# CSS User-Contributed Themes
-
-User-contributed themes. A theme typically consists of two CSS files `foo.css` and `foo-fonts.css`, where `foo` is the theme name. Below are some existing themes:
-
-```{r}
-names(xaringan:::list_css())
-```
-
-To use a theme, you can specify the `css` option as an array of CSS filenames (without the `.css` extensions), e.g.,
-
-```yaml
-output:
-  xaringan::moon_reader:
-    css: [default, metropolis, metropolis-fonts]
-```
-
-If you want to contribute a theme to **xaringan**, please read [this blog post](https://yihui.name/en/2017/10/xaringan-themes).
-
----
-class: duke-orange
-# Figure Captions
-
-<figure>
-  <img src="https://c1.staticflickr.com/5/4095/4735322270_29f2a170bb_n.jpg">
-    <figcaption> Image Credit:  
-      <a href="https://www.flickr.com/photos/wordridden/4735322270/in/photolist-8drLkq-646eKc-nG7uhG-quFpgc-4ucjnx-fe82eN-dYBniL-dYvFA4-9Cf4eR-6EGeNs-6HTKQj-65AZMK-fWBnJR-7xRE6a-6hXAvM-piV5xr-89EMot-6Ea5Ks-dPGTJM-dxKznu-6PLmRW-3YRkU8-5iq1tD-fmHnyr-iiLdJL-e5r9bR-5fAPht-8arifu-oBFJHP-fHytwE-7m3YaS-vKsn9-cMyqho-cNg979-gMG6Ng-6ox1FA-2MHsz8-c9LomS-bq7wvo-nt5ipG-rZ5GFD-duEHPx-pgTp2N-8mzmRJ-67XBkZ-ewrn88-b39pr2-6vRoKp-6mZfyi-6DxVuk">Salad Onions</a> by Jessica Spengler 
-    </figcaption>
-</figure>
-
-.justify-left[
-``` html
-<figure>
-  <img src="foo.png">
-    <figcaption> Image Credit: foo text here </figcaption>
-</figure>
-
-# Must declare figure-captions in the YAML header
-# Must use HTML instead of RMarkdown
+```{r echo=FALSE, message=FALSE, fig.dim=c(12,8)}
+incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  mutate(day_week = weekdays(DateOccurred),
+         hour = hour(DateOccurred)) %>%
+  group_by(day_week, hour) %>%
+  summarise(total_cases = n()) %>%
+  ggplot(aes(x = hour, y = total_cases)) +
+  geom_line() +
+  facet_wrap(~factor(day_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) +
+    theme_minimal() +
+  labs(y = "Total claim number", x = "Hour", title = "Total claim by daily hours")
 
 ```
-]
 
 ---
-exclude: false
-class: center, middle
-background-image: url(https://blogs.library.duke.edu/magazine/files/2010/12/duke-university-libraries-logo.jpg)
-<!-- https://commons.wikimedia.org/wiki/File:Duke_University_logo.svg -->
-<!-- https://blogs.library.duke.edu/magazine/files/2010/12/duke-university-libraries-logo.jpg -->
-<!-- http://library.duke.edu/data/sites/default/files/datagis/images/data_gis_logo.png -->
 
-<!-- HTML comment can go here  -->
+class: middle, center
+
+.full-width[.content-box-duke-green[3) Is it more dangerous for the bus to travel at night or during the daytime?]]
+
+---
+
+## 5 times more claims made during daytime
+
+```{r echo=FALSE, fig.dim=c(12,8)}
+daynight_incidents <- incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  mutate(hour = hour(DateOccurred))
+
+daynight_incidents %>%
+  mutate(day_night = case_when(hour >= 19 | hour %in% c(0, 1, 2, 3, 4) ~ "night",
+                               hour < 19 ~ "day")) %>%
+  group_by(day_night) %>%
+  summarise(total_cases = n()) %>%
+  ggplot(aes(x = day_night, y = total_cases, fill = day_night)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label=total_cases), vjust=1.6, color="white", size=3.5) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(x = "Daytime/night", y = "Total claim number", title = "Total claims made during daytime and night")
+```
+
+---
+
+class: middle, center
+
+.full-width[.content-box-duke-green[4) What kind of weather (temperature and precipitation) is considered safer or dangerous for bus drivers?]]
+
+---
+
+## Most incidents found with rainfall from 1.5 to 4.5 (mm)
+
+```{r echo=FALSE, fig.dim=c(12,8)}
+dh_mva_incidents <- incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  mutate(date_hour = format(DateOccurred, format = "%Y-%m-%d %H")) %>%
+  filter(company %in% c("TDNSW", "TDM"),
+         str_starts(TypeOfClaimName, "MVA"))
+
+melbourneweather <- melbourneweather %>%
+  mutate(company = "TDM",
+         date_hour = format(timestamp, format = "%Y-%m-%d %H")) %>%
+  rename(Temperature = `Melbourne Temperature`, Precipitation = `Melbourne Precipitation Total`)
+
+sydneyweather <- sydneyweather %>%
+  mutate(company = "TDNSW",
+         date_hour = format(timestamp, format = "%Y-%m-%d %H")) %>%
+  rename(Temperature = `Sydney Temperature`, Precipitation = `Sydney Precipitation Total`)
+
+mel_syd_weather <- rbind(melbourneweather, sydneyweather)
+
+weather_n_incidents <- mel_syd_weather %>%
+  mutate(hour = hour(timestamp)) %>%
+  left_join(dh_mva_incidents, by = c("company", "date_hour")) %>%
+  mutate(Temperature = as.numeric(Temperature),
+         Precipitation = as.numeric(Precipitation),
+         rain = case_when(Precipitation >= 2.5 ~ "Yes",
+                          Precipitation < 2.5 ~ "No"),
+         has_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes"))
+
+weather_n_incidents %>%
+  filter(rain == "Yes") %>%
+  ggplot(aes(x = Precipitation, group = has_incident, fill = has_incident)) +
+  geom_density(alpha = 0.5) +
+  facet_wrap(~company, nrow = 2) +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  scale_fill_discrete(labels=c("Non-incident", "Incident")) +
+  labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under rainy condition measured by precipitation") +
+  expand_limits(x = -0.5)
+
+
+```
+
+---
+
+## Most incidents found with rainfall close to 0
+
+```{r echo=FALSE, fig.dim=c(12,8)}
+weather_n_incidents %>%
+  filter(rain == "No") %>%
+  ggplot(aes(x = Precipitation, group = has_incident, fill = has_incident)) +
+  geom_density(alpha = 0.5) +
+  facet_wrap(~company, nrow = 2) +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  scale_fill_discrete(labels=c("Non-incident", "Incident")) +
+  labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under little/no rain condition measured by precipitation") +
+  expand_limits(x = -0.2:2.4)
+
+
+```
+
+---
+
+## log scale distribution under little/no rain and rainy condition (not normally distributed)
+
+```{r message=FALSE, include=FALSE}
+# compare precipitation between has_incident=yes and has_incident=no
+rain_inc <- weather_n_incidents %>%
+  select(Precipitation, has_incident) 
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.dim=c(12,8)}
+ggplot(rain_inc, aes(Precipitation)) +
+        geom_histogram(fill = "white", color = "grey30") +
+        facet_wrap(~has_incident) +
+        scale_x_log10() +
+  labs(title = "Log incidents under little to no rain and rainy condition")
+```
+
+---
+
+## Rain condition vs incidents Wilcox test 
+
+```{r message=FALSE}
+wilcox.test(Precipitation ~ has_incident, data = rain_inc)
+# is associated, relationship
+```
+
+---
+
+## Most incidents found with moderate temperature
+
+```{r echo=FALSE, fig.dim=c(12,8)}
+weather_n_incidents %>%
+  ggplot(aes(x = Temperature, group = has_incident, fill = has_incident)) +
+  geom_density(alpha = 0.5) +
+  facet_grid(~company) +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  scale_fill_discrete(labels=c("Non-incident", "Incident")) +
+  labs(x = "Temperature (°C)", title = "Incident and non-incident distribution measured by temperature")
+
+```
+
+---
+
+# Temperature vs incidents distribution (normally distributed)
+
+```{r include=FALSE}
+temp_inc <- weather_n_incidents %>%
+  select(Temperature, has_incident) 
+```
+
+```{r echo=FALSE, message=FALSE, fig.dim=c(12,8)}
+ggplot(temp_inc, aes(Temperature)) +
+        geom_histogram(fill = "white", color = "grey30") +
+        facet_wrap(~has_incident) 
+```
+
+---
+
+## Temperature vs Incidents T-Test
+
+```{r echo=FALSE, message=FALSE}
+t.test(Temperature ~ has_incident, data = temp_inc)
+# the existence of significance difference
+```
+
+---
+
+class: middle, center
+
+.full-width[.content-box-duke-green[5) Is there a relationship between drivers' driving hours within a day and the likelihood of getting into an incident?]]
+
+
+---
+
+## Distribution of incidents & Hour of driving classfied by day & night
+
+```{r echo=FALSE, fig.dim=c(12,8)} 
+tmp2_when_occur <- tmp2 %>%
+  filter(match_type == 2) %>%
+  distinct(EmployeeID, ClaimCategoryName, DateOccurred, .keep_all = TRUE) %>%
+  mutate(diff_occur_start = difftime(DateOccurred, shift_start),
+         diff_occur_start = diff_occur_start/dhours(),
+         hour = hour(DateOccurred),
+         day_night = case_when(hour >= 19 | hour %in% c(0, 1, 2, 3, 4) ~ "Night",
+                               hour < 19 ~ "Day")) %>%
+  filter(str_starts(TypeOfClaimName, "MVA"))
+tmp2_when_occur$diff_occur_start <- round(tmp2_when_occur$diff_occur_start, digits = 0) 
+
+ggplot(tmp2_when_occur, aes(x = diff_occur_start)) +
+  geom_histogram(aes(y = ..density..), bins = 25, alpha = 0.4) +
+  geom_density() +
+  facet_grid(~day_night) +
+  theme_minimal() +
+  labs(x = "Number of hour(s) after shift start", title = "Hour(s) that claims made after drivers' driving hours in NSW")
+
+```
+
+---
+
+## Random Forest
+
+```{r echo=FALSE, message=FALSE}
+# fix the original random forest dataframe
+nswshifts1 <- nswshifts %>%
+  rename(shift_start = VdsTripStartTime, shift_end = VdsTripEndTime) %>%
+  mutate(JoinDate = as.Date(shift_start)) %>%
+  select(EmployeeID, shift_start, shift_end, JoinDate)
+
+incident1 <- incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  filter(company == "TDNSW", str_starts(TypeOfClaimName, "MVA")) %>%
+  mutate(JoinDate = as.Date(DateOccurred)) %>%
+  group_by(EmployeeID, JoinDate) %>%
+  select(EmployeeID, DateOccurred, JoinDate)
+
+nswshifts_lj_inc <- nswshifts1 %>%
+  group_by(EmployeeID, JoinDate) %>%
+  summarise(shift_start = min(shift_start)-30*60,
+            shift_end = max(shift_end)+30*60) %>%
+  left_join(incident1, by = c("EmployeeID", "JoinDate")) %>%
+  select(EmployeeID, shift_start, shift_end, DateOccurred) %>%
+  mutate(has_incident = case_when(is.na(DateOccurred) ~ "No",
+                                         !is.na(DateOccurred) ~ "Yes"))
+
+long_shifts_inc <- nswshifts_lj_inc %>%
+  mutate(shift_date = as.Date(shift_start),
+         shift_start_hour = hour(shift_start),
+         shift_end_hour = hour(shift_end),
+         Occurred_hour = hour(DateOccurred)) %>% 
+  mutate(shift_end_hour = case_when(shift_end_hour < shift_start_hour ~ 24+shift_end_hour,
+                                    TRUE ~ as.numeric(shift_end_hour)),
+         trip_duration = difftime(shift_end, shift_start),
+         trip_duration = trip_duration/dhours()) %>%
+  filter(trip_duration < 24,
+         shift_start_hour < 22, shift_start_hour > 4) %>%
+  # creating list of shift hours between start and end hour & then unnesting the dataframe to make it long
+  rowwise() %>%
+  mutate(shift_hour_of_day = list(c(shift_start_hour:shift_end_hour))) %>%
+  unnest(cols = c(shift_hour_of_day)) %>%
+  mutate(shift_hour_for_driver = shift_hour_of_day - shift_start_hour) %>%
+  # some further wrangling to remove unneccessary columns & convert incident hour into hourly indicator & restrict inc
+  mutate(incident_indicator = case_when(
+    Occurred_hour == shift_hour_of_day ~ 1,
+    TRUE                               ~ 0
+  )) %>%
+  select(-shift_start, -shift_end, -DateOccurred, -Occurred_hour) 
+
+sydneyweather_dh <- sydneyweather %>%
+  mutate(date = as.Date(timestamp),
+         hour = hour(timestamp),
+         hour = case_when(hour == 0 ~ 24,
+                          TRUE ~ as.numeric(hour)))
+
+nsw_fit_df <- long_shifts_inc %>%
+  left_join(sydneyweather_dh, by = c("shift_date" = "date", "shift_hour_of_day" = "hour")) %>%
+  left_join(driver_info, by = "EmployeeID") %>%
+  ungroup() %>%
+  select(-EmployeeID, -has_incident, -shift_date, -shift_start_hour, -shift_end_hour, -trip_duration, -timestamp, -Depot, -CompanyID, -EmployeeStartDate, -EmploymentTerminationDate, -Position, -ContractType, -FTE, -BirthDate, -company, -date_hour) 
   
-???
-
-Presenter Notes go here
-use 'p' to toggle the presenter mode or '?' or 'h' to toggle the help / key-shortcut options
-
-Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Duke_University_logo.svg)
-
-
----
-class: inverse, middle, center
-
-# More xaringan Documentation
-
----
-
-# xaringan
-
-Provides an R Markdown output format `xaringan::moon_reader` as a wrapper for remark.js, and you can use it in the YAML metadata, e.g.
-
-```yaml
----
-title: "A Cool Presentation"
-output:
-  xaringan::moon_reader
-    yolo: true
-    nature:
-      autoplay: 30000
----
 ```
 
-See the help page `?xaringan::moon_reader` for all possible options that you can use.
-
----
-
-# using **xaringan** 
-
-.pull-right[
-1. Start with an R Markdown document;
-
-1. R Markdown (can embed R/other code chunks);
-
-1. Provide an option `autoplay`;
-
-1. MathJax just works;<sup>*</sup>
-
-1. Highlight code with `{{}}`;
-
-1. The RStudio addin "Infinite Moon Reader" automatically refreshes slides on changes;
-]
-
-.footnote[[*] Not really. See next page.]
-
----
-
-# Math Expressions
-
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &#36;\alpha+\beta$ renders $\alpha+\beta$. You can use the display style with double dollar signs:
-
-```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-```
-
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
-
-Limitations:
-
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
-
-1. There should not be spaces after the opening `$` or before the closing `$`.
-
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
-
----
-
-# R Plots
-
-```{r include=FALSE}
-fit = lm(dist ~ 1 + speed, data = cars)
-coef(summary(fit))
-dojutsu = c('地爆天星', '天照', '加具土命', '神威', '須佐能乎', '無限月読')
-grep('天', dojutsu, value = TRUE)
-```
-
-
-```{r cars, fig.height=4, dev='svg'}
-# visualizations are cool, duh.
-
-par(mar = c(4, 4, 1, .1))
-plot(cars, pch = 19, col = 'darkgray', las = 1)
-abline(fit, lwd = 2)
-```
-
-
----
-
-# Tables
-
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
-
-```{r}
-knitr::kable(head(iris), format = 'html')
-```
-
----
-### more HTML (kable) table
-```{r include=FALSE}
-library(magrittr)
-library(kableExtra)
-```
-
-```{r include=FALSE}
-text_tbl <- data.frame(
-  Items = c("Item 1", "Item 2", "Item 3"),
-  Features = c(
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vehicula tempor ex. Morbi malesuada sagittis turpis, at venenatis nisl luctus a. ",
-    "In eu urna at magna luctus rhoncus quis in nisl. Fusce in velit varius, posuere risus et, cursus augue. Duis eleifend aliquam ante, a aliquet ex tincidunt in. ", 
-    "Vivamus venenatis egestas eros ut tempus. Vivamus id est nisi. Aliquam molestie erat et sollicitudin venenatis. In ac lacus at velit scelerisque mattis. "
-  )
-)
-```
 ```{r echo=FALSE}
-kable(text_tbl, "html") %>%
-  kable_styling(full_width = F, bootstrap_options = c("striped", "hover")) %>%
-  column_spec(1, bold = T, border_right = T) %>%
-  column_spec(2, width = "30em", background = "yellow") %>% 
-  row_spec(3, bold = T, color = "white", background = "#D7261E") %>% 
-  column_spec(1, background = "white", color = "black")
-```
+set.seed(2021)
 
-### Kable HTML Documentation
+nsw_fit_df <- nsw_fit_df %>%
+  na.omit() %>%
+  mutate(incident_indicator = factor(incident_indicator)) 
+nsw_fit_split <- initial_split(nsw_fit_df, 2/3,
+                                         strata = incident_indicator)
+nsw_fit_tr <- training(nsw_fit_split) %>% 
+  mutate(Gender = factor(Gender)) %>% 
+  mutate(Precipitation = as.numeric(Precipitation)) %>%
+  mutate(Temperature = as.numeric(Temperature))
+nsw_fit_ts <- testing(nsw_fit_split)
 
-[Documentation](https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html) for HTML (kable) tables via the `library(kableExtra)` package
+up_train <- upSample(x = nsw_fit_tr[, -ncol(nsw_fit_tr)],
+                     y = nsw_fit_tr$incident_indicator)                         
+table(up_train$Class) 
 
 
----
+nsw_fit_rf <- randomForest(incident_indicator ~ shift_hour_of_day+shift_hour_for_driver+Temperature+Precipitation, data = up_train, importance = TRUE)
+print(nsw_fit_rf)
 
-# HTML Widgets
-
-
-```{r out.width='100%', fig.height=6, eval=require('leaflet')}
-library(leaflet)
-leaflet() %>% addTiles() %>% setView(-93.65, 42.0285, zoom = 17)
-```
-
----
-
-```{r eval=require('DT'), tidy=FALSE}
-DT::datatable(
-  head(iris, 10),
-  fillContainer = FALSE, options = list(pageLength = 8)
-)
 ```
 
 ---
 
-# Highlight Code
+## Variables importance
 
-- The option `highlightLines: true` of `nature` will highlight code lines that start with `*`, or are wrapped in `{{ }}`, or have trailing comments `#<<`;
-
-```yaml
-output:
-  xaringan::moon_reader:
-    nature:
-      highlightLines: true
-```
-
-
-See examples on the next page.
-
----
-
-# Highlight Code with * or `{{}}`
-
-
-.pull-left[
-An example using a leading `*`:
-
-```r
-if (TRUE) {
-** message("Very important!")
-}
-```
-Output:
-```r
-if (TRUE) {
-* message("Very important!")
-}
-```
-
-This is invalid R code, so it is a plain fenced code block that is not executed.
-]
-
-.pull-right[
-An example using `{{}}`:
-
-`r ''````{r tidy=FALSE}
-if (TRUE) {
-*{{ message("Very important!") }}
-}
-```
-
-Output:
-```{r tidy=FALSE}
-if (TRUE) {
-{{ message("Very important!") }}
-}
-```
-
-It is valid R code so you can run it. Note that `{{}}` can wrap an R expression of multiple lines.
-]
-
----
-
-# Highlight with trailing `#<<`
-
-An example of using the trailing comment `#<<` to highlight lines:
-
-``` r
-library(ggplot2)
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +   #<<
-  geom_smooth()    #<<
-```
-
-
-Output:
-
-```{r tidy=FALSE, eval=FALSE}
-library(ggplot2)
-ggplot(mtcars) + 
-  aes(mpg, disp) + 
-  geom_point() +   #<<
-  geom_smooth()    #<<
+```{r echo=FALSE}
+importance(nsw_fit_rf)
+varImpPlot(nsw_fit_rf)
 ```
 
 ---
 
-# Selected xaringan documentation links
-
-1. [xaringan documentation](https://slides.yihui.name/xaringan/)
-
-    - [xarigan wiki](https://github.com/yihui/xaringan/wiki)
-
-1. [hegge CSS](http://biostatistics.dk/presentations/xaringan/ghoul.html)
-
-1. [incrementing slides, layouts, template, place holders](https://slides.yihui.name/xaringan/incremental.html)
-
-1. [remark.js documentation](https://remarkjs.com) library;
-
-
-
+```{r echo=FALSE, fig.dim=c(12,8)}
+plot_predict_interaction(nsw_fit_rf, up_train, "shift_hour_of_day", "shift_hour_for_driver")
+```
 
 ---
 
-# John Little
-
-&nbsp;
-
-.pull-left[.full-width[.content-box-green[
-### Data Analytics Librarian
-
-- https://johnlittle.info/
-
-- https://github.com/libjohn
-]]
-
-### Rfun host...
-You can make **Rfun** with our resources for R and data science analytics.  See the [R we having fun yet‽](https://rfun.library.duke.edu/) resource pages.
-]
-
-.pull-right[.content-box-grey[
-### Duke University
-
-**Data & Visualization Services**
-
-- https://library.duke.edu/data/
-- askData@Duke.edu
-- The /Edge, Bostock (1st Floor)
-- [Past Workshops](https://library.duke.edu/data/news/past-workshops)
-- [Guides & Tutorials](https://library.duke.edu/data/tutorials)
-
-]]
-
-
-
-
+```{r echo=FALSE, fig.dim=c(12,8)}
+plot_predict_interaction(nsw_fit_rf, up_train, "Temperature", "Precipitation")
+```
 ---
-class: center, middle
-## Shareable 
 
-Data, presentation, and handouts 
+class: inverse, center, middle
+# Thank you! 
+
 
 <span class="cc">
 <!-- Key: a: SA, b: BY, c: CC Circle, d: ND, n: NC, m: Sampling, s: Share, r: Remix, C: CC Full Logo -->
-C bn
 </span>
 
 

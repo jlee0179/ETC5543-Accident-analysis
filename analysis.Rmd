@@ -337,7 +337,7 @@ gen_inc_tab <- gen_inc %>%
   mutate(across(has_incident_gdr, round, 2)) %>%
   rename(incident = Yes, `no incident` = No, total = num_of_drvr, prop = has_incident_gdr) 
 gen_inc_tab %>%
-  kable() %>%
+  kable(caption = "Contingency table for gender and incident") %>%
   kable_styling()
 
 
@@ -348,7 +348,9 @@ test_x <- as.matrix(gen_inc_tab %>%
                       ungroup() %>%
                       select(incident, `no incident`))
 CLTest_gen <- prop.test(test_x)
-tidy(CLTest_gen)
+tidy(CLTest_gen) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped")
 ```
 0.02 < 0.05 Reject the null hypothesis. The data provides strong evidence that gender does have an effect on incidents.
 
@@ -550,30 +552,10 @@ age_inc_tab %>%
   kable_styling()
 ```
 
-```{r}
-test_x1 <- as.matrix(age_inc_tab %>%
-                      ungroup() %>%
-                      select(incident, `no incident`))
-CLTest_age <- prop.test(test_x1)
-tidy(CLTest_age)
-```
-
 Driver's age doesn't explain much of the occurrence of incidents.
 
 ```{r}
-res.aov <- age_inc_tab %>% anova_test(prop ~ `age group`)
-res.aov
-
-
-```
-
-```{r}
-#head(age_inc_tab)
-#str(age_inc_tab)
-#model_fit <- lm(prop ~ `age group`, data=age_inc_tab)
-#summary(model_fit)
-
-tmp_tash <- incidents %>%
+bin_age <- incidents %>%
   filter(str_starts(TypeOfClaimName, "MVA")) %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
@@ -595,9 +577,9 @@ tmp_tash <- incidents %>%
     TRUE ~ 0
   ))
 
-head(tmp_tash)
-model_fit <- glm(binary_outcome ~ age_group, data=tmp_tash, family = "binomial") #double check this is logistic regression, not linear regression
+model_fit <- glm(binary_outcome ~ age_group, data=bin_age, family = "binomial") #double check this is logistic regression, not linear regression
 summary(model_fit)
+
 # find anova function that gives p value breakdown - something like 
 ```
 
@@ -655,11 +637,6 @@ tidy(CLTest_yo70)
 ```
 
 May be less data for older than 70. Can't conclude that drivers older than 70 have less incidents.
-
-```{r}
-res.aov <- age_inc_tab %>% anova_test(prop ~ `age group`)
-res.aov
-```
 
 2. On what day have most incidents been found? Which hours are the peak and trough?
 

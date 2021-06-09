@@ -129,280 +129,307 @@ class: middle, center
 
 
 
-&lt;iframe src="p1.html" width="100%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"&gt; &lt;/iframe&gt;
+&lt;iframe src="p1.html" width="90%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"&gt; &lt;/iframe&gt;
 
 ---
 
-# Hello World
+# Drivers had claims by **gender** (%), classified by company 
 
-Install the **dukeslides**&lt;sup&gt;1&lt;/sup&gt; package from [Github](https://github.com/libjohn/dukeslides)
+![](presentation_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+---
+
+# Drivers had claims by **gender** (%), classified with incidents severity
+
+
+
+&lt;iframe src="p2.html" width="90%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"&gt; &lt;/iframe&gt;
+
+---
+
+# Gender vs MVA Incident T-test
+
+
+&lt;style type="text/css"&gt;
+    /* Table width = 100% max-width */
+
+    .remark-slide table{
+        width: 100%;
+    }
+
+    /* Change the background color to white for shaded rows (even rows) */
+
+    .remark-slide thead, .remark-slide tr:nth-child(2n) {
+        background-color: white;
+    }
+&lt;/style&gt;
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Contingency table for gender and incident&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Gender &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; no incident &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; incident &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; total &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; prop &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Female &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 302 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 376 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.68 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Male &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2897 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 967 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3864 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.03 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+
+&lt;div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:737px; "&gt;&lt;table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; estimate1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; estimate2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; statistic &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p.value &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; parameter &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; conf.low &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; conf.high &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; method &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; alternative &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.1968085 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2502588 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.00016 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.025345 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.0973539 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.0095467 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2-sample test for equality of proportions with continuity correction &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; two.sided &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+---
+
+# Drivers had claims by **age** (%) 
+
+![](presentation_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+
+---
+# Drivers had claims by **age** (%), classified with incidents severity
+
+
+
+&lt;iframe src="p3.html" width="80%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"&gt; &lt;/iframe&gt;
+
+---
+
+# Age vs MVA Incident ANOVA Test
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Contingency table for age and incident&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; age group &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; no incident &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; incident &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; total &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; prop &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 20-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 87 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 103 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15.53 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 31-40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 709 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 148 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 857 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.27 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 41-50 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 708 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 205 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 913 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.45 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 51-60 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 801 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 332 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1133 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 29.30 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 61-70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 685 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 274 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 959 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28.57 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 71-80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 194 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 64 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 258 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.81 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 81-90 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.76 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+# Age vs MVA Incident ANOVA Test
+
+
+```
+## 
+## Call:
+## glm(formula = binary_outcome ~ age_group, family = "binomial", 
+##     data = bin_age)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.4058  -1.1591   0.9650   0.9675   1.7653  
+## 
+## Coefficients:
+##                Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)    -0.59471    0.17980  -3.308 0.000941 ***
+## age_group31-40  0.05531    0.19014   0.291 0.771137    
+## age_group41-50  0.55141    0.18766   2.938 0.003299 ** 
+## age_group51-60  1.11076    0.18526   5.996 2.03e-09 ***
+## age_group61-70  1.11714    0.18615   6.001 1.96e-09 ***
+## age_group71-80  0.95087    0.20271   4.691 2.72e-06 ***
+## age_group81-90 -0.72705    0.59076  -1.231 0.218433    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 9795.1  on 7117  degrees of freedom
+## Residual deviance: 9495.7  on 7111  degrees of freedom
+## AIC: 9509.7
+## 
+## Number of Fisher Scoring iterations: 4
+```
+
+---
+
+# Age (before &amp; after 70) vs MVA Incident T-Test
+
+&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
+&lt;caption&gt;Contingency table for age (before &amp;amp; after 70) and incident&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; age group &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; no incident &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; incident &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; total &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; prop &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Older than 70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 255 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 337 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.33 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Younger than 70 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2944 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 959 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3903 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.57 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:737px; "&gt;&lt;table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; estimate1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; estimate2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; statistic &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; p.value &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; parameter &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; conf.low &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; conf.high &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; method &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; alternative &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.2433234 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2457084 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0010012 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9747579 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.0517583 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0469883 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2-sample test for equality of proportions with continuity correction &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; two.sided &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;&lt;/div&gt;
+
+
+---
+
+class: middle, center
+
+.full-width[.content-box-duke-green[2) On what day have most incidents been found? Which hours are the peak and trough?]]
+
+---
+
+# Tuesdays have the most claims, Sundays have the least
 
 
 ```r
-# monospace font is displayed when code is written 
-# inside of an Rmarkdown code chunk
-devtools::install_github("libjohn/dukeslides")
+incidents %&gt;%
+  drop_na(EmployeeNumber) %&gt;%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %&gt;%
+  mutate(day_week = weekdays(as.Date(DateOccurred))) %&gt;%
+  group_by(day_week) %&gt;%
+  summarise(total_cases = n()) %&gt;%
+  ggplot(aes(x = factor(day_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")), total_cases)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  geom_text(aes(label=total_cases), vjust=1.6, color="white", size=3.5)+
+    theme_minimal() +
+  labs(y = "Total claim number", x = "Day", title = "Total claim by day of the week")
 ```
 
-.content-box-grey[
-- **Create a new R Markdown document** from the menu `File -&gt; New File -&gt; R Markdown -&gt; From Template -&gt; Slide template for Duke University`
-]
-
-.content-box-grey[
-- Click the **`Knit`** button **to compile** the slide into rendered HTML]
-
-.footnote[
-[1] [dukeslides](https://github.com/libjohn/dukeslides/) is a [Duke University branded](https://styleguide.duke.edu/color-palette/) version of [xaringan presentation slides](https://slides.yihui.name/xaringan/).
-]
-
----
-# Making Bullets
-
-- List items (bullets) are invoked with a leading, left-justified dash, just like any Rmarkdown&lt;sup&gt;1&lt;/sup&gt; document
-
-``` r
-- List items (bullets) are invoked with a leading,
-left-justified dash, just like any 
-Rmarkdown&lt;sup&gt;1&lt;/sup&gt; document
-```
-.footnote[
-[1] [Getting Started with R Markdown](https://rmarkdown.rstudio.com/lesson-1.html)
-]
-
---
-
-``` r
---
-```
-
-- Two left-justified dashes creates a pause to reveal the slide in increments.  `arrow` keys and number keys advance from slide to slide. [See more documentation on incrementing](https://slides.yihui.name/xaringan/incremental.html#11)
-
----
-# Knit
-
-As previously mentioned, 
-
-.content-box-grey[
-- Click the **`Knit`** button **to compile** the slide into rendered HTML
-]
-
-Or, use the [RStudio Addin](https://rstudio.github.io/rstudioaddins/) "Infinite Moon Reader" to live preview the slides (every time you update and save the Rmd document, the slides will be automatically reloaded in RStudio Viewer.
-
-
----
-background-image: url(https://c2.staticflickr.com/6/5729/30943501632_eb0b200eed_b.jpg)
-class: center, top
-
-# Rock Cairn Hiking
-
-.justify-left[
-``` r
----
-background-image: url(https://c2.staticflickr.com/6/5729/30943501632_eb0b200eed_b.jpg)
-class: center, top
-
-# Rock Cairn Hiking
-
-.footer-note[.tiny[.green[Image Credit: ][Brandon Rasmussen](https://www.flickr.com/photos/137029081@N02/30943501632/in/photostream/)]]
-
-```
-]
-
-
-.footer-note[.tiny[.green[Image Credit: ][Brandon Rasmussen](https://www.flickr.com/photos/137029081@N02/30943501632/in/photostream/)]]
-
-???
-
-``` r
----
-background-image: url(https://c2.staticflickr.com/6/5729/30943501632_eb0b200eed_b.jpg)
-class: center, top, inverse
-
-# Rock Cairn Hiking
-
-
-.footer-note[.tiny[.green[Image Credit: ][Brandon Rasmussen](https://www.flickr.com/photos/137029081@N02/30943501632/in/photostream/)]]
-```
-
----
-## Two Column
-
-.pull-left[
-- You can generate a left column 
-
-- by wrapping the left-hand text in `.pull-left[` foo `]`
-
-- TAGS &lt;sup&gt;1&lt;/sup&gt;
-
-- Splunk
-]
-
-.pull-right[
-- You can generate a right column 
-
-- by wrapping the right-hand text in `.pull-right[` foo `]`
-
-- foo
-
-- foo &lt;sup&gt;2&lt;/sup&gt;
-]
-
-
-``` r
-# superscript is wrapped in HTML
-TAGS &lt;sup&gt;1&lt;/sup&gt;
-
-```
-
-
-.footnote[
-[1] example foonote 1  -- footnote text wrapped in `.footnote[foo]`
-
-[2] example footnote 2 
-]
-
----
-class: inverse
-
-## inverse
-
-### h3
-
-Lorem Ipsum
-
-"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-
-``` r
----
-class: inverse
-
-## inverse
-
-### h3
-
-Lorem Ipsum
-
-"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-```
-
-
----
-class: duke-softblue
-
-## duke-softblue
-
-``` r
----
-class: duke-softblue
-```
-
-Lorem Ipsum
-
-"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-
-- one
-
-- [Google](http://google.com)
-
-- three
-
----
-class: duke-orange
-
-## duke-orange
-
-``` r
----
-class: duke-orange
-```
-
-Lorem Ipsum
-
-"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-
-- one
-
-- [Google](http://google.com)
-
-- three
-
----
-class: duke-green
-
-## duke-green
-
-``` r
----
-class: duke-green
-```
-
-"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-
-- one
-
-- [Green website inspirations](https://webdesignledger.com/50-green-web-designs-to-inspire-you/)
-
-- three
-
----
-background-image: url(http://www.publicdomainpictures.net/pictures/170000/velka/hand-holding-old-keys-1462981136Ul1.jpg)
-background-size: contain
-
-## hygge-duke Two Column
-
-.content-box-grey[ qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit... ]
-
-
-.pull-left[
-&amp;nbsp;
-
-&amp;nbsp;
-
-&amp;nbsp; 
-
-``` r
-.pull-left[ 
-   nabisco crackers 
-   snackum attackum ...
-   ]
-```
-]
-
-&amp;nbsp; 
-
-.pull-right[.full-width[.rotate-left[.content-box-blue[
-
-- Wrap the right-hand text in \.pull-right\[ \.content-box-blue\]
-
-&amp;nbsp; 
-
-&amp;nbsp; 
-
-&amp;nbsp;
-
-
-``` r
-.pull-right[.full-width[
-  .rotate-left[
-    .content-box-blue[snackum 
-      nabiskum]
-]]]
-```
-
-]]]]
-
-&lt;!-- Image credit:  http://www.publicdomainpictures.net/view-image.php?image=167489  --&gt;
-
-&amp;nbsp; 
-
-.footnote[.scriptsize[
-- `background-size: contain`
-- `View Source` to see all of the R Markdown for this slide
-]]
-
-???
-
-Image credit:  http://www.publicdomainpictures.net/view-image.php?image=167489
+![](presentation_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -785,8 +812,8 @@ leaflet() %&gt;% addTiles() %&gt;% setView(-93.65, 42.0285, zoom = 17)
 ```
 
 ```{=html}
-&lt;div id="htmlwidget-a870cedb697df112a5cd" style="width:100%;height:432px;" class="leaflet html-widget"&gt;&lt;/div&gt;
-&lt;script type="application/json" data-for="htmlwidget-a870cedb697df112a5cd"&gt;{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&amp;copy; &lt;a href=\"http://openstreetmap.org\"&gt;OpenStreetMap&lt;\/a&gt; contributors, &lt;a href=\"http://creativecommons.org/licenses/by-sa/2.0/\"&gt;CC-BY-SA&lt;\/a&gt;"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}&lt;/script&gt;
+&lt;div id="htmlwidget-580fd17e2ec608d209c9" style="width:100%;height:432px;" class="leaflet html-widget"&gt;&lt;/div&gt;
+&lt;script type="application/json" data-for="htmlwidget-580fd17e2ec608d209c9"&gt;{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&amp;copy; &lt;a href=\"http://openstreetmap.org\"&gt;OpenStreetMap&lt;\/a&gt; contributors, &lt;a href=\"http://creativecommons.org/licenses/by-sa/2.0/\"&gt;CC-BY-SA&lt;\/a&gt;"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}&lt;/script&gt;
 ```
 
 ---
@@ -800,8 +827,8 @@ DT::datatable(
 ```
 
 ```{=html}
-&lt;div id="htmlwidget-047fa925f6bccb423b2f" style="width:100%;height:auto;" class="datatables html-widget"&gt;&lt;/div&gt;
-&lt;script type="application/json" data-for="htmlwidget-047fa925f6bccb423b2f"&gt;{"x":{"filter":"none","fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10"],[5.1,4.9,4.7,4.6,5,5.4,4.6,5,4.4,4.9],[3.5,3,3.2,3.1,3.6,3.9,3.4,3.4,2.9,3.1],[1.4,1.4,1.3,1.5,1.4,1.7,1.4,1.5,1.4,1.5],[0.2,0.2,0.2,0.2,0.2,0.4,0.3,0.2,0.2,0.1],["setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"&lt;table class=\"display\"&gt;\n  &lt;thead&gt;\n    &lt;tr&gt;\n      &lt;th&gt; &lt;\/th&gt;\n      &lt;th&gt;Sepal.Length&lt;\/th&gt;\n      &lt;th&gt;Sepal.Width&lt;\/th&gt;\n      &lt;th&gt;Petal.Length&lt;\/th&gt;\n      &lt;th&gt;Petal.Width&lt;\/th&gt;\n      &lt;th&gt;Species&lt;\/th&gt;\n    &lt;\/tr&gt;\n  &lt;\/thead&gt;\n&lt;\/table&gt;","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}&lt;/script&gt;
+&lt;div id="htmlwidget-081ba601f3ea135e100f" style="width:100%;height:auto;" class="datatables html-widget"&gt;&lt;/div&gt;
+&lt;script type="application/json" data-for="htmlwidget-081ba601f3ea135e100f"&gt;{"x":{"filter":"none","fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10"],[5.1,4.9,4.7,4.6,5,5.4,4.6,5,4.4,4.9],[3.5,3,3.2,3.1,3.6,3.9,3.4,3.4,2.9,3.1],[1.4,1.4,1.3,1.5,1.4,1.7,1.4,1.5,1.4,1.5],[0.2,0.2,0.2,0.2,0.2,0.4,0.3,0.2,0.2,0.1],["setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"&lt;table class=\"display\"&gt;\n  &lt;thead&gt;\n    &lt;tr&gt;\n      &lt;th&gt; &lt;\/th&gt;\n      &lt;th&gt;Sepal.Length&lt;\/th&gt;\n      &lt;th&gt;Sepal.Width&lt;\/th&gt;\n      &lt;th&gt;Petal.Length&lt;\/th&gt;\n      &lt;th&gt;Petal.Width&lt;\/th&gt;\n      &lt;th&gt;Species&lt;\/th&gt;\n    &lt;\/tr&gt;\n  &lt;\/thead&gt;\n&lt;\/table&gt;","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}&lt;/script&gt;
 ```
 
 ---

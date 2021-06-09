@@ -293,279 +293,498 @@ p1 <- svr_dpt %>%
 htmlwidgets::saveWidget(p1,paste0("p1.html"))
 ```
 
-<iframe src="p1.html" width="100%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"> </iframe>
+<iframe src="p1.html" width="90%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"> </iframe>
 
 ---
 
-# Hello World
+# Drivers had claims by **gender** (%), classified by company 
 
-Install the **dukeslides**<sup>1</sup> package from [Github](https://github.com/libjohn/dukeslides)
+```{r echo=FALSE, message=FALSE, fig.dim=c(12,8)}
+drvr_inc_gdr <- incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) %>%
+  group_by(Gender, CompanyID, driver_incident, EmployeeID) %>%
+  summarise(driver_gdr = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
+  group_by(Gender, CompanyID) %>%
+  summarise(num_drv_inc = sum(driver_gdr))
 
-```{r eval=FALSE, tidy=FALSE}
-# monospace font is displayed when code is written 
-# inside of an Rmarkdown code chunk
-devtools::install_github("libjohn/dukeslides")
+total_drvr_gdr <- driver_info %>%
+  group_by(Gender, CompanyID) %>%
+  summarise(num_of_drvr = n())
+
+drvr_inc_gdr %>%
+  full_join(total_drvr_gdr, by = c("Gender", "CompanyID")) %>%
+  mutate(num_drv_inc = replace_na(num_drv_inc, 0)) %>%
+  mutate(has_incident_gdr = (num_drv_inc/num_of_drvr)*100) %>%
+  mutate(across(has_incident_gdr, round, 2)) %>%
+  ggplot(aes(x = Gender, y = has_incident_gdr, fill = Gender)) +
+  geom_bar(stat = "identity") + 
+  geom_text(aes(label = has_incident_gdr), vjust=1.6, color="white", size=2.5) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  theme_minimal() +
+  facet_grid(.~CompanyID) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(y = "Drivers had claims", fill = "Gender", title = "Proportion of drivers had claims by Gender and company")
+  
 ```
 
-.content-box-grey[
-- **Create a new R Markdown document** from the menu `File -> New File -> R Markdown -> From Template -> Slide template for Duke University`
+---
+
+# Drivers had claims by **gender** (%), classified with incidents severity
+
+```{r echo=FALSE, message=FALSE}
+inc_severity_gdr <- severity_inc %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) %>%
+  group_by(Gender, CompanyID, driver_incident, EmployeeID, severity) %>%
+  summarise(driver_depot = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
+  group_by(Gender, severity, CompanyID) %>%
+  summarise(num_drv_inc = sum(driver_depot))
+  
+total_drvr_gdr <- driver_info %>%
+  group_by(Gender, CompanyID) %>%
+  summarise(num_of_drvr = n())
+
+svr_gdr <- inc_severity_gdr %>%
+  left_join(total_drvr_gdr, by = c("Gender", "CompanyID")) %>%
+  mutate(has_incident_gdr = (num_drv_inc/num_of_drvr)*100) %>%
+  mutate(across(has_incident_gdr, round, 2)) %>%
+  pivot_wider(names_from = severity, values_from = has_incident_gdr) %>%
+  mutate(serious = replace_na(serious, 0),
+         slight = replace_na(slight, 0))
+
+p2 <- svr_gdr %>%
+  mutate(serious_label = paste0(CompanyID," - Serious"),
+         slight_label = paste0(CompanyID," - Slight")) %>%
+  plot_ly(x = ~Gender, color = ~CompanyID) %>%
+  add_trace(y = ~serious, name = ~serious_label, type='bar') %>%
+  add_trace(y = ~slight, name = ~slight_label, type='bar',opacity=0.5)  %>%
+  layout(
+    yaxis = list(title = "Drivers had claims (%)",
+      range=c(0,100)
+    ),
+    title = "Proportion of drivers had claims by Gender and Severity",
+    updatemenus = list(
+      list(
+        type = "buttons",
+        label = 'Category',
+        buttons = list(
+          list(method = "restyle",
+               args = list('visible', c(rep(TRUE,3), rep(FALSE,3))),
+               label = "Serious Only"),
+          list(method = "restyle",
+               args = list('visible', c(rep(FALSE,3), rep(TRUE,3))),
+               label = "Slight Only"),
+          list(method = "restyle",
+               args = list('visible', TRUE),
+               label = "Show All")
+        )
+      )
+    )
+  )
+
+htmlwidgets::saveWidget(p2,paste0("p2.html"))
+```
+
+<iframe src="p2.html" width="90%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"> </iframe>
+
+---
+
+# Gender vs MVA Incident T-test
+
+
+```{css, echo=F}
+    /* Table width = 100% max-width */
+
+    .remark-slide table{
+        width: 100%;
+    }
+
+    /* Change the background color to white for shaded rows (even rows) */
+
+    .remark-slide thead, .remark-slide tr:nth-child(2n) {
+        background-color: white;
+    }
+```
+
+```{r echo=FALSE, message=FALSE}
+gen_inc <- incidents %>%
+  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) %>%
+  group_by(Gender, driver_incident, EmployeeID) %>%
+  summarise(driver_depot = n_distinct(EmployeeID)) %>%
+  group_by(Gender, driver_incident) %>%
+  summarise(num_drv_inc = sum(driver_depot))
+
+tot_drv_gen <- driver_info %>%
+  distinct(EmployeeID, Gender) %>%
+  group_by(Gender) %>%
+  summarise(num_of_drvr = n())
+
+gen_inc_tab <- gen_inc %>%
+  pivot_wider(names_from = driver_incident, values_from = num_drv_inc) %>%
+  left_join(tot_drv_gen, by = "Gender") %>%
+  mutate(has_incident_gdr = (Yes/num_of_drvr)*100) %>%
+  mutate(across(has_incident_gdr, round, 2)) %>%
+  rename(incident = Yes, `no incident` = No, total = num_of_drvr, prop = has_incident_gdr) 
+gen_inc_tab %>%
+  kable(caption = "Contingency table for gender and incident") %>%
+  kable_styling()
+
+
+```
+
+
+
+```{r echo=FALSE}
+test_x <- as.matrix(gen_inc_tab %>%
+                      ungroup() %>%
+                      select(incident, `no incident`))
+CLTest_gen <- prop.test(test_x)
+tidy(CLTest_gen) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, latex_options = "scale_down") %>%
+  scroll_box(width = "737px")
+```
+
+---
+
+# Drivers had claims by **age** (%) 
+
+```{r echo=FALSE, message=FALSE, fig.dim=c(12,8)}
+inc_age <- incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears(),
+         driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes"))
+inc_age$driver_age <- round(inc_age$driver_age, digits = 0)
+inc_age <- inc_age %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
+inc_age <- inc_age %>%
+  group_by(age_group, driver_incident, EmployeeID) %>%
+  summarise(driver_age_group = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
+  group_by(age_group) %>%
+  summarise(num_drv_inc = sum(driver_age_group))
+
+
+drvr_info_age <- driver_info %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears())
+drvr_info_age$driver_age <- round(drvr_info_age$driver_age, digits = 0)
+drvr_info_age <- drvr_info_age %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
+drvr_info_age <- drvr_info_age %>%
+  group_by(age_group) %>%
+  summarise(num_of_drvr = n())
+
+inc_age %>%
+  full_join(drvr_info_age, by = "age_group") %>%
+  mutate(has_incident_age = (num_drv_inc/num_of_drvr)*100) %>%
+  mutate(across(has_incident_age, round, 2)) %>%
+  ggplot(aes(x = age_group, y = has_incident_age, fill = age_group)) +
+  geom_bar(stat = "identity") + 
+  geom_text(aes(label = has_incident_age), vjust=1.6, color="white", size=2.5) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(x = "Age group", y = "Drivers had claims", fill = "Age group", title = "Proportion of drivers had claims by Age")
+```
+
+---
+# Drivers had claims by **age** (%), classified with incidents severity
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+inc_severity_age <- severity_inc %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears(),
+         driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes")) 
+
+inc_severity_age$driver_age <- round(inc_severity_age$driver_age, digits = 0)
+inc_severity_age <- inc_severity_age %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
+
+inc_severity_age <- inc_severity_age %>%
+  group_by(age_group, driver_incident, EmployeeID, severity) %>%
+  summarise(driver_age_group = n_distinct(EmployeeID)) %>%
+  filter(driver_incident == "Yes") %>%
+  group_by(age_group, severity) %>%
+  summarise(num_drv_inc = sum(driver_age_group))
+  
+drvr_info_age <- driver_info %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears())
+drvr_info_age$driver_age <- round(drvr_info_age$driver_age, digits = 0)
+drvr_info_age <- drvr_info_age %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
+drvr_info_age <- drvr_info_age %>%
+  group_by(age_group) %>%
+  summarise(num_of_drvr = n())
+
+svr_age <- inc_severity_age %>%
+  full_join(drvr_info_age, by = "age_group") %>%
+  mutate(has_incident_age = (num_drv_inc/num_of_drvr)*100) %>%
+  mutate(across(has_incident_age, round, 2)) %>%
+  pivot_wider(names_from = severity, values_from = has_incident_age) %>%
+  mutate(serious = replace_na(serious, 0),
+         slight = replace_na(slight, 0))
+
+p3 <- plot_ly(svr_age, x = ~age_group, mode='markers') %>%
+  add_trace(y = ~serious, name = 'serious', type='bar', mode='markers') %>%
+  add_trace(y = ~slight, name = 'slight', type='bar', mode='markers') %>%
+  layout(
+    title = "Proportion of drivers had claims by Age group and Severity",
+    xaxis = list(title = "Age group"),
+    yaxis = list(title = "Drivers had claims (%)",
+                 range=c(0,100)),
+    updatemenus = list(
+      list(
+        type = "buttons",
+        label = 'Category',
+        buttons = list(
+          list(method = "restyle",
+               args = list('visible', c(TRUE, FALSE, FALSE)),
+               label = "Serious Only"),
+          list(method = "restyle",
+               args = list('visible', c(FALSE, TRUE, FALSE)),
+               label = "Slight Only"),
+          list(method = "restyle",
+               args = list("visible", TRUE),
+               label = "Show All")
+        )
+      )
+    )
+  )
+
+htmlwidgets::saveWidget(p3,paste0("p3.html"))
+```
+
+<iframe src="p3.html" width="80%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"> </iframe>
+
+---
+
+# Age vs MVA Incident ANOVA Test
+
+```{r echo=FALSE, message=FALSE}
+age_mva_inc <- incidents %>%
+  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears(),
+         driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes"))
+age_mva_inc$driver_age <- round(age_mva_inc$driver_age, digits = 0)
+age_mva_inc <- age_mva_inc %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90")) %>%
+  group_by(age_group, driver_incident, EmployeeID) %>%
+  summarise(driver_age_group = n_distinct(EmployeeID)) %>%
+  group_by(age_group, driver_incident) %>%
+  summarise(num_drvage_inc = sum(driver_age_group))
+
+tot_drv_age <- driver_info %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears())
+
+tot_drv_age$driver_age <- round(tot_drv_age$driver_age, digits = 0)
+
+tot_drv_age <- tot_drv_age %>%
+  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90")) %>%
+  distinct(EmployeeID, age_group) %>%
+  group_by(age_group) %>%
+  summarise(num_of_drvr = n())
+
+age_inc_tab <- age_mva_inc %>%
+  pivot_wider(names_from = driver_incident, values_from = num_drvage_inc) %>%
+  left_join(tot_drv_age, by = "age_group") %>%
+  mutate(has_incident_age = (Yes/num_of_drvr)*100) %>%
+  mutate(across(has_incident_age, round, 2)) %>%
+  rename(`age group` = age_group, incident = Yes, `no incident` = No, total = num_of_drvr, prop = has_incident_age) 
+
+# ordinal e.g. 20-30, 41-50, 51-60, 61-70. Same contingency format
+age_inc_tab %>%
+  kable(caption = "Contingency table for age and incident") %>%
+  kable_styling()
+```
+
+---
+
+# Age vs MVA Incident ANOVA Test
+
+```{r echo=FALSE}
+bin_age <- incidents %>%
+  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears(),
+         driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes"),
+         driver_age = round(driver_age,digits=0),
+         age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
+                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
+                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
+                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
+                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
+                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
+                               driver_age >= 81 & driver_age <= 90 ~ "81-90")) %>%
+  mutate(binary_outcome = case_when(
+    driver_incident == 'Yes' ~ 1,
+    TRUE ~ 0
+  ))
+
+model_fit <- glm(binary_outcome ~ age_group, data=bin_age, family = "binomial") #double check this is logistic regression, not linear regression
+
+# find anova function that gives p value breakdown - something like 
+```
+
+.scrollable-slide[
+```{r}
+summary(model_fit) 
+```
 ]
 
-.content-box-grey[
-- Click the **`Knit`** button **to compile** the slide into rendered HTML]
-
-.footnote[
-[1] [dukeslides](https://github.com/libjohn/dukeslides/) is a [Duke University branded](https://styleguide.duke.edu/color-palette/) version of [xaringan presentation slides](https://slides.yihui.name/xaringan/).
-]
-
 ---
-# Making Bullets
 
-- List items (bullets) are invoked with a leading, left-justified dash, just like any Rmarkdown<sup>1</sup> document
+# Age (before & after 70) vs MVA Incident T-Test
 
-``` r
-- List items (bullets) are invoked with a leading,
-left-justified dash, just like any 
-Rmarkdown<sup>1</sup> document
-```
-.footnote[
-[1] [Getting Started with R Markdown](https://rmarkdown.rstudio.com/lesson-1.html)
-]
+```{r echo=FALSE, message=FALSE}
+age_mva_inc1 <- incidents %>%
+  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  right_join(driver_info, by = "EmployeeID") %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears(),
+         driver_incident = case_when(is.na(ClaimNumber) ~ "No",
+                                         !is.na(ClaimNumber) ~ "Yes"))
+age_mva_inc1$driver_age <- round(age_mva_inc1$driver_age, digits = 0)
+yo_70_inc <- age_mva_inc1 %>%
+  mutate(age_group = case_when(driver_age < 70 ~ "Younger than 70",
+                               driver_age >= 70 ~ "Older than 70")) %>%
+  group_by(age_group, driver_incident, EmployeeID) %>%
+  summarise(driver_age_group = n_distinct(EmployeeID)) %>%
+  group_by(age_group, driver_incident) %>%
+  summarise(num_drvage_inc = sum(driver_age_group))
 
---
+tot_drv_age1 <- driver_info %>%
+  mutate(driver_age = today() - dmy(BirthDate),
+         driver_age = driver_age/dyears())
 
-``` r
---
-```
+tot_drv_age1$driver_age <- round(tot_drv_age1$driver_age, digits = 0)
 
-- Two left-justified dashes creates a pause to reveal the slide in increments.  `arrow` keys and number keys advance from slide to slide. [See more documentation on incrementing](https://slides.yihui.name/xaringan/incremental.html#11)
+tot_drv_age1 <- tot_drv_age1 %>%
+  mutate(age_group = case_when(driver_age < 70 ~ "Younger than 70",
+                               driver_age >= 70 ~ "Older than 70")) %>%
+  distinct(EmployeeID, age_group) %>%
+  group_by(age_group) %>%
+  summarise(num_of_drvr = n())
 
----
-# Knit
-
-As previously mentioned, 
-
-.content-box-grey[
-- Click the **`Knit`** button **to compile** the slide into rendered HTML
-]
-
-Or, use the [RStudio Addin](https://rstudio.github.io/rstudioaddins/) "Infinite Moon Reader" to live preview the slides (every time you update and save the Rmd document, the slides will be automatically reloaded in RStudio Viewer.
-
-
----
-background-image: url(https://c2.staticflickr.com/6/5729/30943501632_eb0b200eed_b.jpg)
-class: center, top
-
-# Rock Cairn Hiking
-
-.justify-left[
-``` r
----
-background-image: url(https://c2.staticflickr.com/6/5729/30943501632_eb0b200eed_b.jpg)
-class: center, top
-
-# Rock Cairn Hiking
-
-.footer-note[.tiny[.green[Image Credit: ][Brandon Rasmussen](https://www.flickr.com/photos/137029081@N02/30943501632/in/photostream/)]]
-
-```
-]
+yo70_inc_tab <- yo_70_inc %>%
+  pivot_wider(names_from = driver_incident, values_from = num_drvage_inc) %>%
+  left_join(tot_drv_age1, by = "age_group") %>%
+  mutate(has_incident_age = (Yes/num_of_drvr)*100) %>%
+  mutate(across(has_incident_age, round, 2)) %>%
+  rename(`age group` = age_group, incident = Yes, `no incident` = No, total = num_of_drvr, prop = has_incident_age) 
 
 
-.footer-note[.tiny[.green[Image Credit: ][Brandon Rasmussen](https://www.flickr.com/photos/137029081@N02/30943501632/in/photostream/)]]
-
-???
-
-``` r
----
-background-image: url(https://c2.staticflickr.com/6/5729/30943501632_eb0b200eed_b.jpg)
-class: center, top, inverse
-
-# Rock Cairn Hiking
-
-
-.footer-note[.tiny[.green[Image Credit: ][Brandon Rasmussen](https://www.flickr.com/photos/137029081@N02/30943501632/in/photostream/)]]
+yo70_inc_tab %>%
+  kable(caption = "Contingency table for age (before & after 70) and incident") %>%
+  kable_styling()
 ```
 
----
-## Two Column
-
-.pull-left[
-- You can generate a left column 
-
-- by wrapping the left-hand text in `.pull-left[` foo `]`
-
-- TAGS <sup>1</sup>
-
-- Splunk
-]
-
-.pull-right[
-- You can generate a right column 
-
-- by wrapping the right-hand text in `.pull-right[` foo `]`
-
-- foo
-
-- foo <sup>2</sup>
-]
-
-
-``` r
-# superscript is wrapped in HTML
-TAGS <sup>1</sup>
-
-```
-
-
-.footnote[
-[1] example foonote 1  -- footnote text wrapped in `.footnote[foo]`
-
-[2] example footnote 2 
-]
-
----
-class: inverse
-
-## inverse
-
-### h3
-
-Lorem Ipsum
-
-"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-
-``` r
----
-class: inverse
-
-## inverse
-
-### h3
-
-Lorem Ipsum
-
-"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
+```{r echo=FALSE}
+test_x2 <- as.matrix(yo70_inc_tab %>%
+                      ungroup() %>%
+                      select(incident, `no incident`))
+CLTest_yo70 <- prop.test(test_x2)
+tidy(CLTest_yo70) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE, latex_options = "scale_down") %>%
+  scroll_box(width = "737px")
 ```
 
 
 ---
-class: duke-softblue
 
-## duke-softblue
+class: middle, center
 
-``` r
+.full-width[.content-box-duke-green[2) On what day have most incidents been found? Which hours are the peak and trough?]]
+
 ---
-class: duke-softblue
+
+# Tuesdays have the most claims, Sundays have the least
+
+```{r echo=FALSE}
+incidents %>%
+  drop_na(EmployeeNumber) %>%
+  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
+  mutate(day_week = weekdays(as.Date(DateOccurred))) %>%
+  group_by(day_week) %>%
+  summarise(total_cases = n()) %>%
+  ggplot(aes(x = factor(day_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")), total_cases)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  geom_text(aes(label=total_cases), vjust=1.6, color="white", size=3.5)+
+    theme_minimal() +
+  labs(y = "Total claim number", x = "Day", title = "Total claim by day of the week")
 ```
-
-Lorem Ipsum
-
-"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-
-- one
-
-- [Google](http://google.com)
-
-- three
-
----
-class: duke-orange
-
-## duke-orange
-
-``` r
----
-class: duke-orange
-```
-
-Lorem Ipsum
-
-"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-
-- one
-
-- [Google](http://google.com)
-
-- three
-
----
-class: duke-green
-
-## duke-green
-
-``` r
----
-class: duke-green
-```
-
-"Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit..."
-
-- one
-
-- [Green website inspirations](https://webdesignledger.com/50-green-web-designs-to-inspire-you/)
-
-- three
-
----
-background-image: url(http://www.publicdomainpictures.net/pictures/170000/velka/hand-holding-old-keys-1462981136Ul1.jpg)
-background-size: contain
-
-## hygge-duke Two Column
-
-.content-box-grey[ qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit... ]
-
-
-.pull-left[
-&nbsp;
-
-&nbsp;
-
-&nbsp; 
-
-``` r
-.pull-left[ 
-   nabisco crackers 
-   snackum attackum ...
-   ]
-```
-]
-
-&nbsp; 
-
-.pull-right[.full-width[.rotate-left[.content-box-blue[
-
-- Wrap the right-hand text in \.pull-right\[ \.content-box-blue\]
-
-&nbsp; 
-
-&nbsp; 
-
-&nbsp;
-
-
-``` r
-.pull-right[.full-width[
-  .rotate-left[
-    .content-box-blue[snackum 
-      nabiskum]
-]]]
-```
-
-]]]]
-
-<!-- Image credit:  http://www.publicdomainpictures.net/view-image.php?image=167489  -->
-
-&nbsp; 
-
-.footnote[.scriptsize[
-- `background-size: contain`
-- `View Source` to see all of the R Markdown for this slide
-]]
-
-???
-
-Image credit:  http://www.publicdomainpictures.net/view-image.php?image=167489
 
 ---
 

@@ -4,7 +4,7 @@
     <title>ETC5543 Business analytics creative activity</title>
     <meta charset="utf-8" />
     <meta name="author" content="Joyce Lee" />
-    <meta name="date" content="2021-06-10" />
+    <meta name="date" content="2021-06-11" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
@@ -23,7 +23,7 @@ class: center, middle, inverse, title-slide
 # ETC5543 Business analytics creative activity
 ## Presentation
 ### Joyce Lee
-### 2021-06-10
+### 2021-06-11
 
 ---
 
@@ -110,25 +110,9 @@ class: middle, center
 
 ---
 
-## Drivers had claims by **depot** (%), classified with incidents severity
-
-
-
-&lt;iframe src="p1.html" width="90%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"&gt; &lt;/iframe&gt;
-
----
-
 ## Drivers had claims by **gender** (%), classified by company 
 
-![](presentation_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
-
----
-
-## Drivers had claims by **gender** (%), classified with incidents severity
-
-
-
-&lt;iframe src="p2.html" width="90%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"&gt; &lt;/iframe&gt;
+![](presentation_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -213,14 +197,7 @@ class: middle, center
 
 ## Drivers had claims by **age** (%) 
 
-![](presentation_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
-
----
-## Drivers had claims by **age** (%), classified with incidents severity
-
-
-
-&lt;iframe src="p3.html" width="80%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"&gt; &lt;/iframe&gt;
+![](presentation_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -298,10 +275,6 @@ class: middle, center
 
 .scrollable-slide[
 
-```r
-summary(model_fit) 
-```
-
 ```
 ## 
 ## Call:
@@ -336,69 +309,6 @@ summary(model_fit)
 
 ---
 
-## Age (before &amp; after 70) vs MVA Incident T-Test
-
-&lt;table class="table" style="margin-left: auto; margin-right: auto;"&gt;
-&lt;caption&gt;Contingency table for age (before &amp;amp; after 70) and incident&lt;/caption&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; age group &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; no incident &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; incident &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; total &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; prop &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Older than 70 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 179 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 159 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 338 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 47.04 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Younger than 70 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1612 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2290 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3902 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 58.69 &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:737px; "&gt;&lt;table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:right;"&gt; estimate1 &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; estimate2 &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; statistic &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; p.value &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; parameter &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; conf.low &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; conf.high &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; method &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; alternative &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0.4704142 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.5868785 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 16.81898 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 4.11e-05 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; -0.1734799 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; -0.0594488 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 2-sample test for equality of proportions with continuity correction &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; two.sided &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;&lt;/div&gt;
-
-
----
-
 class: middle, center
 
 .full-width[.content-box-duke-green[2) On what day have most incidents been found? Which hours are the peak and trough?]]
@@ -407,13 +317,13 @@ class: middle, center
 
 ## Most claims on Tuesdays, least on Sundays
 
-![](presentation_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+![](presentation_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
 
 ---
 
 ## Most claims at peak hours for weekdays, at 3-4pm for weekends
 
-![](presentation_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+![](presentation_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -425,7 +335,7 @@ class: middle, center
 
 ## 5 times more claims made during daytime
 
-![](presentation_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+![](presentation_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -437,21 +347,15 @@ class: middle, center
 
 ## Most incidents found with rainfall from 1.5 to 4.5 (mm)
 
-![](presentation_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+![](presentation_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
 
 ---
 
-## Most incidents found with rainfall close to 0
-
-![](presentation_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
-
----
-
-## log scale distribution under little/no rain and rainy condition (not normally distributed)
+## log scale distribution for incidents &amp; non-incident (not normally distributed)
 
 
 
-![](presentation_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+![](presentation_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -471,15 +375,11 @@ wilcox.test(Precipitation ~ has_incident, data = rain_inc)
 ## alternative hypothesis: true location shift is not equal to 0
 ```
 
-```r
-# is associated, relationship
-```
-
 ---
 
 ## Most incidents found with moderate temperature
 
-![](presentation_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
+![](presentation_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -487,7 +387,7 @@ wilcox.test(Precipitation ~ has_incident, data = rain_inc)
 
 
 
-![](presentation_files/figure-html/unnamed-chunk-31-1.png)&lt;!-- --&gt;
+![](presentation_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -519,7 +419,7 @@ class: middle, center
 
 ## Distribution of incidents &amp; Hour of driving classfied by day &amp; night
 
-![](presentation_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+![](presentation_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -533,6 +433,8 @@ class: middle, center
 ##     0     1 
 ## 39994 39994
 ```
+
+.pre[
 
 ```
 ## 
@@ -548,11 +450,12 @@ class: middle, center
 ## 0 27377 12617  0.31547232
 ## 1  2864 37130  0.07161074
 ```
-
+]
 ---
 
 ## Variables importance
 
+.pre[
 
 ```
 ##                               0        1 MeanDecreaseAccuracy MeanDecreaseGini
@@ -561,16 +464,36 @@ class: middle, center
 ## Temperature           -11.60708 152.7067             150.2549        10848.697
 ## Precipitation          16.30465 288.8519             287.9000         1045.711
 ```
+]
 
-![](presentation_files/figure-html/unnamed-chunk-36-1.png)&lt;!-- --&gt;
+![](presentation_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
 
----
-
-![](presentation_files/figure-html/unnamed-chunk-37-1.png)&lt;!-- --&gt;
 
 ---
 
-![](presentation_files/figure-html/unnamed-chunk-38-1.png)&lt;!-- --&gt;
+## Prediction of the forest: Driving hour vs hour of the day
+
+![](presentation_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+
+---
+
+## Prediction of the forest: Temperature vs Precipitation
+
+![](presentation_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+
+---
+
+class: middle
+
+# Key takeaways:
+
+* Drivers' performance in Joondalup, WA is worth inspecting.
+* Although the number of female drivers who had incidents are less than males, the number is much higher than expected, compared with drivers' gender ratio.
+* Mid-age drivers had incurred more incidents.
+* High number of incidents at 7-8am and 3pm on weekdays, at 3pm on weekends.
+* Result has shown it is more dangerous to drive in the daytime.
+* Weather is associated with incidents, although little to no extreme temperature or precipitation is found with more incidents.
+* Drivers are suggested to rest more for long trips at night.
 
 ---
 

@@ -231,74 +231,6 @@ drvr_inc_dpt %>%
 
 ---
 
-## Drivers had claims by **depot** (%), classified with incidents severity
-
-```{r echo=FALSE, message=FALSE}
-severity_inc <- incidents %>%
-  mutate(severity = case_when(TypeOfClaimName %in% c("MVA - Hit by Third Party", "MVA - Hit parked vehicle", "Customer Injury- Heavy Braking", "MVA - Hit moving vehicle while driving straight", "MVA - Hit moving vehicle while turning", "MVA - Hit stationary vehicle while turning", "MVA - Hit stationary vehicle driving straight", "MVA - Hit illegally parked vehicle", "MVA - Hit moving vehicle while changing lanes", "Pedestrian Injury - Hit by Transdev vehicle", "MVA - Hit bus station", "Employee Injury - Motor Vehicle Accident", "Motor Vehicle Collision", "Collision with Public") ~ "serious",
-                              TypeOfClaimName %in% c("MVA - Hit tree/ tree branch", "MVA - Hit barrier/ bollard", "MVA - Near Miss", "MVA - Reversing", "MVA bus stop sign", "MVA bus stop pole") ~ "slight")) %>%
-  filter(severity %in% c("serious", "slight"))
-
-inc_severity_dept <- severity_inc %>%
-  drop_na(EmployeeNumber) %>%
-  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
-  right_join(driver_info, by = "EmployeeID") %>%
-  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
-                                         !is.na(ClaimNumber) ~ "Yes")) %>%
-  group_by(Depot, CompanyID, driver_incident, EmployeeID, severity) %>%
-  summarise(driver_depot = n_distinct(EmployeeID)) %>%
-  filter(driver_incident == "Yes") %>%
-  group_by(Depot, severity, CompanyID) %>%
-  summarise(num_drv_inc = sum(driver_depot))
-  
-total_drvr_dpt <- driver_info %>%
-  group_by(Depot, CompanyID) %>%
-  summarise(num_of_drvr = n())
-
-svr_dpt <- inc_severity_dept %>%
-  left_join(total_drvr_dpt, by = c("Depot", "CompanyID")) %>%
-  mutate(has_incident_dpt = (num_drv_inc/num_of_drvr)*100) %>%
-  mutate(across(has_incident_dpt, round, 2)) %>%
-  pivot_wider(names_from = severity, values_from = has_incident_dpt) %>%
-  mutate(serious = replace_na(serious, 0),
-         slight = replace_na(slight, 0))
-
-p1 <- svr_dpt %>%
-  mutate(serious_label = paste0(CompanyID," - Serious"),
-         slight_label = paste0(CompanyID," - Slight")) %>%
-  plot_ly(x = ~Depot, color = ~CompanyID) %>%
-  add_trace(y = ~serious, name = ~serious_label, type='bar',width = 0.3) %>%
-  add_trace(y = ~slight, name = ~slight_label, type='bar', width=0.3,opacity=0.5) %>%
-  layout(
-    title = "Proportion of drivers had claims by Depot and Severity",
-    yaxis = list(title = "Drivers had claims (%)",
-                 range=c(0,100)),
-    updatemenus = list(
-      list(
-        type = "buttons",
-        #label = 'Category',
-        buttons = list(
-          list(method = "restyle",
-               args = list('visible', c(rep(TRUE,3), rep(FALSE,3))),
-               label = "Serious Only"),
-          list(method = "restyle",
-               args = list('visible', c(rep(FALSE,3), rep(TRUE,3))),
-               label = "Slight Only"),
-          list(method = "restyle",
-               args = list('visible', TRUE),
-               label = "Show All")
-        )
-      )
-    )
-  )
-
-htmlwidgets::saveWidget(p1,paste0("p1.html"))
-```
-
-<iframe src="p1.html" width="90%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"> </iframe>
-
----
-
 ## Drivers had claims by **gender** (%), classified by company 
 
 ```{r echo=FALSE, message=FALSE, fig.dim=c(12,8)}
@@ -333,70 +265,6 @@ drvr_inc_gdr %>%
   labs(y = "Drivers had claims", fill = "Gender", title = "Proportion of drivers had claims by Gender and company")
   
 ```
-
----
-
-## Drivers had claims by **gender** (%), classified with incidents severity
-
-```{r echo=FALSE, message=FALSE}
-inc_severity_gdr <- severity_inc %>%
-  drop_na(EmployeeNumber) %>%
-  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
-  right_join(driver_info, by = "EmployeeID") %>%
-  mutate(driver_incident = case_when(is.na(ClaimNumber) ~ "No",
-                                         !is.na(ClaimNumber) ~ "Yes")) %>%
-  group_by(Gender, CompanyID, driver_incident, EmployeeID, severity) %>%
-  summarise(driver_depot = n_distinct(EmployeeID)) %>%
-  filter(driver_incident == "Yes") %>%
-  group_by(Gender, severity, CompanyID) %>%
-  summarise(num_drv_inc = sum(driver_depot))
-  
-total_drvr_gdr <- driver_info %>%
-  group_by(Gender, CompanyID) %>%
-  summarise(num_of_drvr = n())
-
-svr_gdr <- inc_severity_gdr %>%
-  left_join(total_drvr_gdr, by = c("Gender", "CompanyID")) %>%
-  mutate(has_incident_gdr = (num_drv_inc/num_of_drvr)*100) %>%
-  mutate(across(has_incident_gdr, round, 2)) %>%
-  pivot_wider(names_from = severity, values_from = has_incident_gdr) %>%
-  mutate(serious = replace_na(serious, 0),
-         slight = replace_na(slight, 0))
-
-p2 <- svr_gdr %>%
-  mutate(serious_label = paste0(CompanyID," - Serious"),
-         slight_label = paste0(CompanyID," - Slight")) %>%
-  plot_ly(x = ~Gender, color = ~CompanyID) %>%
-  add_trace(y = ~serious, name = ~serious_label, type='bar') %>%
-  add_trace(y = ~slight, name = ~slight_label, type='bar',opacity=0.5)  %>%
-  layout(
-    yaxis = list(title = "Drivers had claims (%)",
-      range=c(0,100)
-    ),
-    title = "Proportion of drivers had claims by Gender and Severity",
-    updatemenus = list(
-      list(
-        type = "buttons",
-        label = 'Category',
-        buttons = list(
-          list(method = "restyle",
-               args = list('visible', c(rep(TRUE,3), rep(FALSE,3))),
-               label = "Serious Only"),
-          list(method = "restyle",
-               args = list('visible', c(rep(FALSE,3), rep(TRUE,3))),
-               label = "Slight Only"),
-          list(method = "restyle",
-               args = list('visible', TRUE),
-               label = "Show All")
-        )
-      )
-    )
-  )
-
-htmlwidgets::saveWidget(p2,paste0("p2.html"))
-```
-
-<iframe src="p2.html" width="90%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"> </iframe>
 
 ---
 
@@ -521,92 +389,6 @@ inc_age %>%
 ```
 
 ---
-## Drivers had claims by **age** (%), classified with incidents severity
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-inc_severity_age <- severity_inc %>%
-  drop_na(EmployeeNumber) %>%
-  distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
-  right_join(driver_info, by = "EmployeeID") %>%
-  mutate(driver_age = today() - dmy(BirthDate),
-         driver_age = driver_age/dyears(),
-         driver_incident = case_when(is.na(ClaimNumber) ~ "No",
-                                         !is.na(ClaimNumber) ~ "Yes")) 
-
-inc_severity_age$driver_age <- round(inc_severity_age$driver_age, digits = 0)
-inc_severity_age <- inc_severity_age %>%
-  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
-                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
-                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
-                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
-                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
-                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
-                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
-
-inc_severity_age <- inc_severity_age %>%
-  group_by(age_group, driver_incident, EmployeeID, severity) %>%
-  summarise(driver_age_group = n_distinct(EmployeeID)) %>%
-  filter(driver_incident == "Yes") %>%
-  group_by(age_group, severity) %>%
-  summarise(num_drv_inc = sum(driver_age_group))
-  
-drvr_info_age <- driver_info %>%
-  mutate(driver_age = today() - dmy(BirthDate),
-         driver_age = driver_age/dyears())
-drvr_info_age$driver_age <- round(drvr_info_age$driver_age, digits = 0)
-drvr_info_age <- drvr_info_age %>%
-  mutate(age_group = case_when(driver_age >= 20 & driver_age <= 30 ~ "20-30",
-                               driver_age >= 31 & driver_age <= 40 ~ "31-40",
-                               driver_age >= 41 & driver_age <= 50 ~ "41-50",
-                               driver_age >= 51 & driver_age <= 60 ~ "51-60",
-                               driver_age >= 61 & driver_age <= 70 ~ "61-70",
-                               driver_age >= 71 & driver_age <= 80 ~ "71-80",
-                               driver_age >= 81 & driver_age <= 90 ~ "81-90"))
-drvr_info_age <- drvr_info_age %>%
-  group_by(age_group) %>%
-  summarise(num_of_drvr = n())
-
-svr_age <- inc_severity_age %>%
-  full_join(drvr_info_age, by = "age_group") %>%
-  mutate(has_incident_age = (num_drv_inc/num_of_drvr)*100) %>%
-  mutate(across(has_incident_age, round, 2)) %>%
-  pivot_wider(names_from = severity, values_from = has_incident_age) %>%
-  mutate(serious = replace_na(serious, 0),
-         slight = replace_na(slight, 0))
-
-p3 <- plot_ly(svr_age, x = ~age_group, mode='markers') %>%
-  add_trace(y = ~serious, name = 'serious', type='bar', mode='markers') %>%
-  add_trace(y = ~slight, name = 'slight', type='bar', mode='markers') %>%
-  layout(
-    title = "Proportion of drivers had claims by Age group and Severity",
-    xaxis = list(title = "Age group"),
-    yaxis = list(title = "Drivers had claims (%)",
-                 range=c(0,100)),
-    updatemenus = list(
-      list(
-        type = "buttons",
-        label = 'Category',
-        buttons = list(
-          list(method = "restyle",
-               args = list('visible', c(TRUE, FALSE, FALSE)),
-               label = "Serious Only"),
-          list(method = "restyle",
-               args = list('visible', c(FALSE, TRUE, FALSE)),
-               label = "Slight Only"),
-          list(method = "restyle",
-               args = list("visible", TRUE),
-               label = "Show All")
-        )
-      )
-    )
-  )
-
-htmlwidgets::saveWidget(p3,paste0("p3.html"))
-```
-
-<iframe src="p3.html" width="80%" height="380" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"> </iframe>
-
----
 
 ## Age vs MVA Incident ANOVA Test
 
@@ -698,7 +480,7 @@ model_fit <- glm(binary_outcome ~ age_group, data=bin_age, family = "binomial") 
 ```
 
 .scrollable-slide[
-```{r}
+```{r echo=FALSE}
 summary(model_fit) 
 ```
 ]
@@ -832,26 +614,7 @@ weather_n_incidents %>%
 
 ---
 
-## Most incidents found with rainfall close to 0
-
-```{r echo=FALSE, fig.dim=c(12,8)}
-weather_n_incidents %>%
-  filter(rain == "No") %>%
-  ggplot(aes(x = Precipitation, group = has_incident, fill = has_incident)) +
-  geom_density(alpha = 0.5) +
-  facet_wrap(~company, nrow = 2) +
-  theme_minimal() +
-  theme(legend.title = element_blank()) +
-  scale_fill_discrete(labels=c("Non-incident", "Incident")) +
-  labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under little/no rain condition measured by precipitation") +
-  expand_limits(x = -0.2:2.4)
-
-
-```
-
----
-
-## log scale distribution under little/no rain and rainy condition (not normally distributed)
+## log scale distribution for incidents & non-incident (not normally distributed)
 
 ```{r message=FALSE, include=FALSE}
 # compare precipitation between has_incident=yes and has_incident=no
@@ -864,7 +627,7 @@ ggplot(rain_inc, aes(Precipitation)) +
         geom_histogram(fill = "white", color = "grey30") +
         facet_wrap(~has_incident) +
         scale_x_log10() +
-  labs(title = "Log incidents under little to no rain and rainy condition")
+  labs(title = "Log distribution of precipitation for non-incidents and incidents")
 ```
 
 ---
@@ -873,7 +636,7 @@ ggplot(rain_inc, aes(Precipitation)) +
 
 ```{r message=FALSE}
 wilcox.test(Precipitation ~ has_incident, data = rain_inc)
-# is associated, relationship
+
 ```
 
 ---
@@ -904,7 +667,8 @@ temp_inc <- weather_n_incidents %>%
 ```{r echo=FALSE, message=FALSE, fig.dim=c(12,8)}
 ggplot(temp_inc, aes(Temperature)) +
         geom_histogram(fill = "white", color = "grey30") +
-        facet_wrap(~has_incident) 
+        facet_wrap(~has_incident) +
+  labs(title = "Temperature distribution for non-incidents and incidents")
 ```
 
 ---
@@ -1033,20 +797,32 @@ table(up_train$Class)
 
 
 nsw_fit_rf <- randomForest(incident_indicator ~ shift_hour_of_day+shift_hour_for_driver+Temperature+Precipitation, data = up_train, importance = TRUE)
-print(nsw_fit_rf)
 
 ```
 
+.pre[
+```{r echo=FALSE}
+  print(nsw_fit_rf)
+```
+]
 ---
 
 ## Variables importance
 
+.pre[
 ```{r echo=FALSE}
 importance(nsw_fit_rf)
+```
+]
+
+```{r echo=FALSE, fig.dim=c(7,5)}
 varImpPlot(nsw_fit_rf)
 ```
 
+
 ---
+
+## Prediction of the forest: Driving hour vs hour of the day
 
 ```{r echo=FALSE, fig.dim=c(12,8)}
 plot_predict_interaction(nsw_fit_rf, up_train, "shift_hour_of_day", "shift_hour_for_driver")
@@ -1054,9 +830,25 @@ plot_predict_interaction(nsw_fit_rf, up_train, "shift_hour_of_day", "shift_hour_
 
 ---
 
+## Prediction of the forest: Temperature vs Precipitation
+
 ```{r echo=FALSE, fig.dim=c(12,8)}
 plot_predict_interaction(nsw_fit_rf, up_train, "Temperature", "Precipitation")
 ```
+
+---
+
+class: middle
+
+# Key takeaways:
+
+* Drivers' performance in Joondalup, WA is worth inspecting.
+* Although the number of female drivers who had incidents are less than males, the number is much higher than expected, compared with drivers' gender ratio.
+* Mid-age drivers had incurred more incidents.
+* High number of incidents at 7-8am and 3pm on weekdays, at 3pm on weekends.
+* Result has shown it is more dangerous to drive in the daytime.
+* Weather is associated with incidents, although little to no extreme temperature or precipitation is found with more incidents.
+* Drivers are suggested to rest more for long trips at night.
 
 ---
 

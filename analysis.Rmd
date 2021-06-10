@@ -314,7 +314,7 @@ MVA
 
 ```{r}
 gen_inc <- incidents %>%
-  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  filter(grepl('MVA|Motor', ClaimCategoryName)) %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
   right_join(driver_info, by = "EmployeeID") %>%
@@ -499,7 +499,7 @@ MVA
 
 ```{r}
 age_mva_inc <- incidents %>%
-  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  filter(grepl('MVA|Motor', ClaimCategoryName)) %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
   right_join(driver_info, by = "EmployeeID") %>%
@@ -556,7 +556,7 @@ Driver's age doesn't explain much of the occurrence of incidents.
 
 ```{r}
 bin_age <- incidents %>%
-  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  filter(grepl('MVA|Motor', ClaimCategoryName)) %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
   right_join(driver_info, by = "EmployeeID") %>%
@@ -585,7 +585,7 @@ summary(model_fit)
 
 ```{r}
 age_mva_inc1 <- incidents %>%
-  filter(str_starts(TypeOfClaimName, "MVA")) %>%
+  filter(grepl('MVA|Motor', ClaimCategoryName)) %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
   right_join(driver_info, by = "EmployeeID") %>%
@@ -701,7 +701,7 @@ dh_mva_incidents <- incidents %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
   mutate(date_hour = format(DateOccurred, format = "%Y-%m-%d %H")) %>%
   filter(company %in% c("TDNSW", "TDM"),
-         str_starts(TypeOfClaimName, "MVA"))
+         grepl('MVA|Motor', ClaimCategoryName))
 
 melbourneweather <- melbourneweather %>%
   mutate(company = "TDM",
@@ -779,7 +779,7 @@ tmp2_when_occur <- tmp2 %>%
          hour = hour(DateOccurred),
          day_night = case_when(hour >= 19 | hour %in% c(0, 1, 2, 3, 4) ~ "Night",
                                hour < 19 ~ "Day")) %>%
-  filter(str_starts(TypeOfClaimName, "MVA"))
+  filter(grepl('MVA|Motor', ClaimCategoryName))
 tmp2_when_occur$diff_occur_start <- round(tmp2_when_occur$diff_occur_start, digits = 0) 
 
 ggplot(tmp2_when_occur, aes(x = diff_occur_start)) +
@@ -803,7 +803,7 @@ nswshifts1 <- nswshifts %>%
 incident1 <- incidents %>%
   drop_na(EmployeeNumber) %>%
   distinct(EmployeeID, ClaimCategoryId, DateOccurred, .keep_all = TRUE) %>%
-  filter(company == "TDNSW", str_starts(TypeOfClaimName, "MVA")) %>%
+  filter(company == "TDNSW", grepl('MVA|Motor', ClaimCategoryName)) %>%
   mutate(JoinDate = as.Date(DateOccurred)) %>%
   group_by(EmployeeID, JoinDate) %>%
   select(EmployeeID, DateOccurred, JoinDate)

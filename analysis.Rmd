@@ -26,6 +26,24 @@ library(rstatix)
 library(tidyverse)
 ```
 
+
+### Literature Review
+
+The promotion of public transportation, despite being a common vision among nations, still is encountering road safety issues with the growing bus accidents in some countries. In emerging countries, e.g. Nepal and India, drivers and driving behaviour had been the leading cause of accidents, followed by external factors and vehicle conditions (Pearce & Maunder, 2000). Although as a developed country, investigations on the common factors mentioned above and the need to discover more relevant ones is necessary for Australia.
+ 
+Truong and Currie (2019) assess the effectiveness of riding public transportation as a means of overcoming road safety issues. Types of transportation are individually measured in terms of their relative impacts. The CAR model takes into account factors, e.g. the age of the population in the sampled area, the speed limits and more, to study the causation between the environment and crashes. The ultimate result proves buses to be the safest transportation. A percentage point of increase in the proportion of riding buses could reduce 5.7. Further, factors relevant to buses - signalised intersections, public transport stops and roads with speed limits above 100km/h are positively associated with crashes.
+ 
+Samerei, Aghabayk, Mohammadi and Shiwakoti (2021) follow up to consider the related factors’ relationship with the fatality due to bus accidents in Australia. Clustering analysis and association rules are applied respectively so that simultaneous or conditional events of factors can be revealed. From the clustering analysis, the largest proportion of total crashes are occupied by collisions with motor vehicles on weekdays (55%). Weekends are of great danger, accumulating the most fatality and serious injury, compared with other clusters. From the analysis of association rules, on weekdays, roads with speed limits over 50 are more likely to have bus collisions with motor vehicles than those without. Old, male drivers are associated with a 1.98 increase in cases except colliding with motor vehicles on weekdays. On weekends, the existence of pedestrians on highways is of high risk with 15.35 times of fatality increase. Additionally, darkness is more likely to incur the fatality of bus accidents in Australia.
+ 
+In contrast, from a preventive perspective, Porcu, Olivo, Maternini and Barabino (2019) establish a risk index methodology to examine bus safety in Cagliari, Italy. The probability, severity of bus accidents and exposing factors are incorporated into the risk assessment index. Unlike Truong and Currie (2019), relevant variables are not explicitly specified in the function, however are categorised under six broad factors: infrastructure, driver, vehicle, etc. Based on model selection, it draws to the conclusion that in Cagliari, medium, short sized buses traveling on roads with two to three lanes with bus priority are conditions that could result in a low risk index. Different from the results in Australia (Samerei et al., 2021), night is of less danger in Cagliari. On the opposite, drivers of standard-sized buses driving on roads with wide sidewalks and neighbourhood roads should be more aware as these factors tend to raise the risk level. Winter is also found to be more dangerous.
+ 
+Unlike countries e.g. the US and the UK, the operation of buses in Malaysia has not been well managed over years with the growing bus accidents in the intercity. Law, Daud, Hamid and Haron (2017) adopt a similar idea as Porcu et al. (2019) by creating Safety Performance Index (SPI) to evaluate the risk based on the attributable factors. Through the aggregation and classification of the factors, road environment condition accounts for the most detrimental cause of bus accidents. Two-lane roads, narrow road shoulders and nighttime trips are positively associated with the most risk. From the data exploration, factors e.g. using mobile phones when driving, drivers exceeding the speed limits and the low quality of tires, are identified to be hazardous.
+ 
+Bus priority policy is focused by Goh, Currie, Sarvi and Logan (2014) to discover the weight it has placed on resolving bus accident issues in Melbourne. Prediction models are built with the potential factors as the inputs and the corresponding parameters. The better performing model acknowledges bus priority as a useful approach in maintaining road safety with a reduction of 53.3% in accident frequency. Further, it reveals the tendency for accidents to occur more often as traffic volume, route length and service frequency increase. Again, it verifies the positive correlation between bus stop density and accident frequency, as found in Truong and Currie (2019).
+ 
+In short, bus stop density and route length especially highways are the common factors addressed across Australian-based articles that more attention should be given to in response to bus safety. From the different regions discussed, bus priority plays a significant role in reducing environmental inference for bus drivers. The effect of darkness varies between countries, yet is contributing towards bus accidents in Australia.
+
+
 ### Data wrangling
 
 ```{r}
@@ -754,6 +772,35 @@ weather_n_incidents %>%
 
 ```
 
+Rain distribution can do t-test, test significance. NOTE: look up requirements for t-test.
+two-sampled t-test
+
+```{r}
+# compare precipitation between has_incident=yes and has_incident=no
+rain_inc <- weather_n_incidents %>%
+  select(Precipitation, has_incident) 
+# has_incident = yes
+summary(rain_inc %>%
+          filter(has_incident == "Yes") %>%
+          .$Precipitation)
+
+summary(rain_inc %>%
+          filter(has_incident == "No") %>%
+          .$Precipitation)
+```
+
+```{r}
+ggplot(rain_inc, aes(Precipitation)) +
+        geom_histogram(fill = "white", color = "grey30") +
+        facet_wrap(~has_incident) +
+        scale_x_log10()
+```
+
+```{r}
+wilcox.test(Precipitation ~ has_incident, data = rain_inc)
+# is associated, relationship
+```
+
 ```{r}
 weather_n_incidents %>%
   ggplot(aes(x = Temperature, group = has_incident, fill = has_incident)) +
@@ -766,7 +813,31 @@ weather_n_incidents %>%
 
 ```
 
+Temperature: 
 
+```{r}
+temp_inc <- weather_n_incidents %>%
+  select(Temperature, has_incident) 
+# has_incident = yes
+summary(rain_inc %>%
+          filter(has_incident == "Yes") %>%
+          .$Temperature)
+
+summary(rain_inc %>%
+          filter(has_incident == "No") %>%
+          .$Temperature)
+```
+
+```{r}
+ggplot(temp_inc, aes(Temperature)) +
+        geom_histogram(fill = "white", color = "grey30") +
+        facet_wrap(~has_incident) 
+```
+
+```{r}
+t.test(Temperature ~ has_incident, data = temp_inc)
+# the existence of significance difference
+```
 
 5. Is there a relationship between drivers' driving hours within a day and the likelihood of getting into an incident?
 
@@ -896,59 +967,5 @@ plot_predict_interaction(nsw_fit_rf, up_train, "Temperature", "Precipitation")
 Mean Decrease Accuracy: How much the model accuracy decreases if we drop that variable.
 Mean Decrease Gini: Measure of variable importance based on Gini impurity index used for the calculation of splits in trees.
 
-Rain distribution can do t-test, test significance. NOTE: look up requirements for t-test.
-two-sampled t-test
 
-```{r}
-# compare precipitation between has_incident=yes and has_incident=no
-rain_inc <- weather_n_incidents %>%
-  select(Precipitation, has_incident) 
-# has_incident = yes
-summary(rain_inc %>%
-          filter(has_incident == "Yes") %>%
-          .$Precipitation)
 
-summary(rain_inc %>%
-          filter(has_incident == "No") %>%
-          .$Precipitation)
-```
-
-```{r}
-ggplot(rain_inc, aes(Precipitation)) +
-        geom_histogram(fill = "white", color = "grey30") +
-        facet_wrap(~has_incident) +
-        scale_x_log10()
-```
-
-```{r}
-wilcox.test(Precipitation ~ has_incident, data = rain_inc)
-# is associated, relationship
-```
-
-Temperature: 
-
-```{r}
-temp_inc <- weather_n_incidents %>%
-  select(Temperature, has_incident) 
-# has_incident = yes
-summary(rain_inc %>%
-          filter(has_incident == "Yes") %>%
-          .$Temperature)
-
-summary(rain_inc %>%
-          filter(has_incident == "No") %>%
-          .$Temperature)
-```
-
-```{r}
-ggplot(temp_inc, aes(Temperature)) +
-        geom_histogram(fill = "white", color = "grey30") +
-        facet_wrap(~has_incident) 
-```
-
-```{r}
-t.test(Temperature ~ has_incident, data = temp_inc)
-# the existence of significance difference
-```
-
-Comparing with rainfall, temperature is more associated with the occurrence of accidents.

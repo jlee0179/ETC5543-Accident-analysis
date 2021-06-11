@@ -138,9 +138,8 @@ sydneyweather <- sydneyweather %>%
 
 ### Questions:
 
-1. How are drivers' characteristics (Depot, gender and age) affecting the incidents? Which is contributing the most incidents?'
+### 1) How are drivers' characteristics (Depot, gender and age) affecting the incidents? Do they genuinely contribute to the occurrence of incidents?
 
-How are drivers' characteristics (Depot, gender and age) affecting the incidents? Do they genuinely contribute to the occurrence of incidents?
 
 
 ```{r}
@@ -656,7 +655,7 @@ tidy(CLTest_yo70)
 
 May be less data for older than 70. Can't conclude that drivers older than 70 have less incidents.
 
-2. On what day have most incidents been found? Which hours are the peak and trough?
+### 2) On what day have most incidents been found? Which hours are the peak and trough?
 
 ```{r}
 incidents %>%
@@ -688,7 +687,7 @@ incidents %>%
 
 ```
 
-3. Is it more dangerous for the bus to travel at night or during the daytime?
+### 3) Is it more dangerous for the bus to travel at night or during the daytime?
 
 ```{r}
 daynight_incidents <- incidents %>%
@@ -711,7 +710,7 @@ daynight_incidents %>%
 
 
 
-4. What kind of weather (temperature and precipitation) is considered safer or dangerous for bus drivers?
+### 4) What kind of weather (temperature and precipitation) is considered safer or dangerous for bus drivers?
 
 ```{r}
 dh_mva_incidents <- incidents %>%
@@ -839,7 +838,7 @@ t.test(Temperature ~ has_incident, data = temp_inc)
 # the existence of significance difference
 ```
 
-5. Is there a relationship between drivers' driving hours within a day and the likelihood of getting into an incident?
+### 5) Is there a relationship between drivers' driving hours within a day and the likelihood of getting into an incident?
 
 ```{r}
 tmp2_when_occur <- tmp2 %>%

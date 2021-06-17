@@ -258,7 +258,7 @@ drvr_inc_dpt_mva %>%
 
 All drivers are first grouped according to their corresponding depots. The proportion is calculated by the number of drivers that have MVA incidents divided by total drivers in each depot.
 
-Out of 23 depots, only 4 don't have an incident. Drivers of depots located in NSW and Melbourne have recorded more than half the MVA accidents. Revesby and Taren Point in NSW are the depots with the highest driver incident rates. Despite that NSW has the most depots with incidents, drivers with depots in Melbourne are involved with the most incidents. Doncaster, North-Fitzroy, Sunshine West and Thomastown are noted with the most danger. 
+Out of 23 depots, only 4 don't have an incident. Drivers of depots located in NSW and Melbourne have recorded more than half the MVA accidents. Revesby and Taren Point in NSW are the depots with the highest driver incident rates. Despite that NSW has the most depots with incidents, drivers with depots in Melbourne are involved with the most incidents. Doncaster, North-Fitzroy, Sunshine West and Keysborough are noted with the most danger. 
 
 The discrepancy exists between states, the driver incident rates for depots in WA are much lower, compared with NSW and Melbourne. This may lie in the population differences. Even though a very small portion of drivers in WA had incidents, still, 75% of drivers in Joondalup depot have encountered MVA incidents.
 

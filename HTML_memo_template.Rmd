@@ -77,39 +77,42 @@ library(tidyverse)
 
 # Executive Summary
 
-This report aims to discover the linkages between motor vehicle accidents (MVA incidents) and other potential factors. The ultimate goal is to resolve the current safety concerns with the information obtained. The data provided allows the exploration of various features, including depots, gender, age, tenure, weather, time and drivers’ workload. Data visualisation enables the initial understanding of the trend and pattern between the features of interest and the occurrence of incidents. Further, statistical tests clarify whether the selected feature is of sufficient weight on the output or not. Instead of making predictions on the incident, the purpose of modeling here is to convey the latent effect on incidents. Integrating the findings with interpretation, several recommendations are raised for optimising drivers’ and passengers’ safety.
+This report aims to discover the linkages between motor vehicle accidents (MVA incidents) and other potential factors. The ultimate goal is to resolve the current safety concerns with the information obtained. The data allows the exploration of various features, including depots, gender, age, tenure, weather, time and drivers’ workload. Data visualisation enables the initial understanding of the trend and pattern between the features of interest and the occurrence of incidents. Further, statistical tests clarify whether the selected feature is of sufficient weight on the output. Instead of making predictions, the purpose of modeling here is to convey the latent effect on incidents. Integrating the findings with interpretation, several recommendations are raised for improving drivers’ and passengers’ safety.
 
-Overall, the results for the chosen variables are unanimous, they are all associated with the occurrence of incidents. Although depots have not been formally tested with statistical methods, we are able to observe the difference in incidents by region. Crowded areas are observed with more drivers involved in incidents. Albeit the discrepancy between gender is significant with the greater likelihood for male drivers to get into an incident, there are more details to be discussed. Not many young drivers have been recorded with an incident, however, this is arguable when referring to their tenure with only a few trips driven, compared with other age groups. The eldest age group are the stable drivers with fewer incidents. Temperature and precipitation are proven to affect incidents, yet the impact is not as apparent as expected. The peak traffic hours are highlighted in the analysis as more incidents are found during the period. Finally, drivers’ workload with incidents seems to be more related at night where drivers are not suggested to take long shifts.
+Overall, the results for the chosen variables are unanimous, all of them are associated with the occurrence of incidents. Although depots have not been formally tested with statistical methods, we observe the difference in incidents by region. Crowded areas are known with higher driver incident rates. Albeit the discrepancy between gender is significant with the greater likelihood for male drivers to get into an incident, more details are to be discussed. Not many young drivers have been recorded with an incident. This is arguable when referring to their tenure with only a few trips driven, compared with other age groups. The eldest age group demonstrates the highest stability with fewer incidents. Temperature and precipitation are proven to affect incidents, yet the impact is not as apparent as expected. Time is highlighted in the analysis as more incidents are found during peak traffic hours. Finally, drivers’ workload with incidents are related at daytime and night, drivers are not suggested to take long shifts.
+
 
 # Introduction
 
-Public transport has often been deemed the response to environmental pollution and road safety issues. The ideal picture is that the more people on public transport, the less the traffic volume and pollution, the better the road safety ([Mackie, 2008](https://bcmj.org/presidents-comment/benefits-riding-bus)). Indeed, it brings about a good balance on both problems with its widely witnessed benefits. For instance, the reform on traffic policy by only allowing buses and taxis for accessing some areas in Ljubljana, Slovenia, has substantially cut down 72% of Black Carbon pollution ([Titos, et al., 2015](https://doi.org/10.1016/j.atmosenv.2015.05.027)). Regarding safety, injuries due to accidents have reduced by 24% since the introduction of night buses in Israel ([Sadot, 2019](https://doi.org/10.1016/j.regsciurbeco.2018.11.009)). Looking from an external view, although it appears as a win-win solution, it is not. Internally, public transport is exposed to risks anywhere and anytime that could put itself in danger, thus cannot be neglected. Its high capacity of passengers suggests the heavier burden faced.
+Public transport has been deemed the response to environmental pollution and road safety issues. The ideal picture is that the more people on public transport, the less the traffic volume and pollution, the better the road safety ([Mackie, 2008](https://bcmj.org/presidents-comment/benefits-riding-bus)). Indeed, it brings about a good balance on both problems with its widely witnessed benefits. For instance, the reform on traffic policy by only allowing buses and taxis for accessing some areas in Ljubljana, Slovenia, has substantially cut down 72% of Black Carbon pollution ([Titos, et al., 2015](https://doi.org/10.1016/j.atmosenv.2015.05.027)). Regarding safety, injuries due to accidents have reduced by 24% since the introduction of night buses in Israel ([Sadot, 2019](https://doi.org/10.1016/j.regsciurbeco.2018.11.009)). Looking from an external view, although it appears as a win-win solution, it is not. Internally, public transport is exposed to risks anywhere and anytime that could put itself in danger, thus cannot be neglected. Its high capacity of passengers suggests the heavier burden faced.
 
-Statistics of bus accidents vary from research to research. A downward trend of fatalities caused by bus accidents emerges from 2009 to 2014, yet it is not an enduring one with the growing fatalities found afterward ([Samerei et al., 2021](https://doi.org/10.1016/j.jsr.2020.12.004)). On the other hand, statistics from [Hughes (2021)](https://www.statista.com/statistics/1076120/australia-bus-fatalities/) show a significant drop in the number of fatalities from 2017 to 2018, followed by a rise in 2019. This kind of inconsistency might have resulted from the different data and analysis methods used, thus suggesting the need to conduct analyses with the data in hand. The decreased usage of buses in these two years, the times full of unknown, has especially intensified the importance for the causes of bus accidents. Apart from passengers' potential shift towards private vehicles to avoid the crowd in the bus, the public transport industry is anticipated to either grow or fall as the pandemic abates ([IBISWorld, 2020](https://www.ibisworld.com/au/industry/public-transport/1965/)). Therefore, it is crucial to examine the bus operation now to minimise safety concerns for the near future. 
+Statistics of bus accidents vary from research to research. A downward trend of fatalities caused by bus accidents emerges from 2009 to 2014, yet it is not enduring with a growth found afterward ([Samerei et al., 2021](https://doi.org/10.1016/j.jsr.2020.12.004)). On the other hand, statistics from [Hughes (2021)](https://www.statista.com/statistics/1076120/australia-bus-fatalities/) show a significant drop in the number of fatalities from 2017 to 2018, followed by a rise in 2019. This inconsistency might have resulted from the different data and analysis methods used, thus suggesting the need to conduct analyses with the data in hand. The decreased usage of buses in these two years, the times full of unknown, has intensified the importance of understanding the causes of accidents. Apart from passengers’ potential shift towards private vehicles to avoid the crowd in the bus, the public transport industry is anticipated to either grow or fall as the pandemic abates ([IBISWorld, 2020](https://www.ibisworld.com/au/industry/public-transport/1965/)). Therefore, it is crucial to examine the bus operation now to minimise safety concerns for the near future.
 
-Numerous factors induce bus accidents, researchers that have performed relevant analyses mainly focus on dimensions encompassing drivers, vehicles and environments. Drivers' gender, age and behaviour are counted towards drivers' characteristics and are frequently discussed with their driving performance. Vehicle-specific causes take into account factors, e.g. the age and type of vehicles, which could affect drivers' control over the bus. Environments relate to external factors, e.g. speed limits, road design and lighting facilities, that could contribute to bus accidents. The extent to which these variables are analysed depends on the available information in the data, however, any additional, related ones found in the data will be inspected.
+Numerous factors induce bus accidents. Researchers who have performed relevant analyses mainly focus on dimensions encompassing drivers, vehicles and environments. Drivers’ gender, age and behaviour are counted towards drivers’ characteristics and are frequently discussed with their driving performance. Vehicle-specific causes take into account factors, e.g. the age and type of vehicles, which could affect drivers’ control over the bus. Environments relate to external factors, e.g. speed limits, road design and lighting facilities, that could contribute to bus accidents. The extent to which these variables are analysed depends on the available information in the data, however, any additional, related ones found will be inspected.
 
-This report surrounds the five proposed questions to uncover the risks carried by the identified factors through data manipulation. Initially, we assess the weights of the selected variables, depot, gender, age and drivers' tenure, on the occurrences of MVA (motor vehicle accidents) incidents (see appendix). Data visualisation produces the overview, which serves to depict the existing patterns. Multiple statistical tests are applied to see whether a difference within the groups of a certain variable would also generate different results for incidents or not. Subsequently, visualisation facilitates in understanding the patterns of the MVA incidents in day and time order, e.g. day of the week, the hour of the day and day/night. In this report, the weather condition is based on temperature and precipitation. Due to the possible bias for certain weather with more or less data, statistical tests help to determine its significance on MVA incidents. A random forest is built in the last question to evaluate the importance of the included variables on the occurrence of incidents. It helps to reveal some linkages between variables and their impacts on the outcome. Finally, recommendations are made based on the analysis results.
+This report surrounds the five proposed questions to uncover the risks carried by the identified factors through data manipulation. Initially, we assess the weights of the selected variables, depot, gender, age and drivers’ tenure, on the occurrences of MVA incidents (see appendix). Data visualisation produces the overview, which serves to depict the existing patterns. Multiple statistical tests are applied to see whether a difference within the groups of a certain variable would generate different results for incidents. Subsequently, visualisation facilitates in understanding the patterns of the MVA incidents in day and time order, e.g. day of the week, hour of the day and day/night. In this report, the weather condition is based on temperature and precipitation. Due to the possible bias for certain weather with more or less data, statistical tests help to determine its significance on MVA incidents. A random forest is built in the last question to judge the importance of different influencing factors to the incidents. It reveals linkages between variables and their impacts on the outcome. Finally, recommendations are made based on the analysis results.
+
 
 # Literature Review
 
-The promotion of public transportation, despite being a common vision among nations, still is encountering road safety issues with the growing bus accidents in some countries. In emerging countries, e.g. Nepal and India, drivers and driving behaviour had been the leading cause of accidents, followed by external factors and vehicle conditions ([Pearce & Maunder, 2000](http://transport-links.com/wp-content/uploads/2019/11/1_549_PA3574-.pdf)). Although as a developed country, investigations on the common factors mentioned above and the need to discover more relevant ones is necessary for Australia.
- 
-[Truong and Currie (2019)](https://doi.org/10.1016/j.aap.2019.105270) assess the effectiveness of riding public transportation as a means of overcoming road safety issues. Types of transportation are individually measured in terms of their relative impacts. The CAR model takes into account factors, e.g. the age of the population in the sampled area, the speed limits and more, to study the causation between the environment and crashes. The ultimate result proves buses to be the safest transportation. A percentage point of increase in the proportion of riding buses could reduce 5.7. Further, factors relevant to buses - signalised intersections, public transport stops and roads with speed limits above 100km/h are positively associated with crashes.
- 
-[Samerei, et al. (2021)](https://doi.org/10.1016/j.jsr.2020.12.004) follow up to consider the related factors’ relationship with the fatality due to bus accidents in Australia. Clustering analysis and association rules are applied respectively so that simultaneous or conditional events of factors can be revealed. From the clustering analysis, the largest proportion of total crashes are occupied by collisions with motor vehicles on weekdays (55%). Weekends are of great danger, accumulating the most fatality and serious injury, compared with other clusters. From the analysis of association rules, on weekdays, roads with speed limits over 50 are more likely to have bus collisions with motor vehicles than those without. Old, male drivers are associated with a 1.98 increase in cases except colliding with motor vehicles on weekdays. On weekends, the existence of pedestrians on highways is of high risk with 15.35 times of fatality increase. Additionally, darkness is more likely to incur the fatality of bus accidents in Australia.
- 
+The promotion of public transportation, despite being a common vision among nations, still is encountering road safety issues with the growing bus accidents in some countries. In emerging countries, e.g. Nepal and India, drivers and driving behaviour had been the leading cause of accidents, followed by external factors and vehicle conditions ([Pearce & Maunder, 2000](http://transport-links.com/wp-content/uploads/2019/11/1_549_PA3574-.pdf)). Although as a developed country, investigations on the common factors mentioned above and the need to discover more relevant ones are necessary for Australia.
+
+[Truong and Currie (2019)](https://doi.org/10.1016/j.aap.2019.105270) assess the effectiveness of riding public transportation as a means to overcome road safety issues. Transportation types are individually measured in terms of their relative impacts. The CAR model takes into account factors, e.g. the age of the population in the sampled area, the speed limits and more, to study the causation between the environment and crashes. The ultimate result proves buses to be the safest transportation. A percentage point increase in the proportion of riding buses could reduce 5.7. Further, factors relevant to buses - signalised intersections, public transport stops and roads with speed limits above 100km/h are positively associated with crashes.
+
+[Samerei, et al. (2021)](https://doi.org/10.1016/j.jsr.2020.12.004) follow up to consider the relevant factors’ relationship with the fatality due to bus accidents in Australia. Clustering analysis and association rules are applied respectively so that simultaneous or conditional events of factors can be revealed. From the clustering analysis, the largest proportion of total crashes are occupied by collisions with motor vehicles on weekdays (55%). Weekends are of great danger, accumulating the most fatality and serious injury, compared with other clusters. From the analysis of association rules, on weekdays, roads with speed limits over 50 are more likely to have bus collisions with motor vehicles than those without. Old, male drivers are associated with a 1.98 increase in cases except colliding with motor vehicles on weekdays. On weekends, the existence of pedestrians on highways is of high risk with 15.35 times of fatality increase. Additionally, darkness is more likely to incur the fatality of bus accidents in Australia.
+
 In contrast, from a preventive perspective, [Porcu, et al. (2019)](https://doi.org/10.1016/j.trpro.2020.03.037) establish a risk index methodology to examine bus safety in Cagliari, Italy. The probability, severity of bus accidents and exposing factors are incorporated into the risk assessment index. Unlike [Truong and Currie (2019)](https://doi.org/10.1016/j.aap.2019.105270), relevant variables are not explicitly specified in the function, however are categorised under six broad factors: infrastructure, driver, vehicle, etc. Based on model selection, it draws to the conclusion that in Cagliari, medium, short sized buses traveling on roads with two to three lanes with bus priority are conditions that could result in a low-risk index. Different from the results in Australia ([Samerei et al., 2021](https://doi.org/10.1016/j.jsr.2020.12.004)), night is of less danger in Cagliari. On the opposite, drivers of standard-sized buses driving on roads with wide sidewalks and neighbourhood roads should be more aware as these factors tend to raise the risk level. Winter is also found to be more dangerous.
- 
-Unlike countries e.g. the US and the UK, the operation of buses in Malaysia has not been well managed over years with the growing bus accidents in the intercity. [Law, et al. (2017)](https://doi.org/10.1016/j.tranpol.2017.05.003) adopt a similar idea as [Porcu et al. (2019)](https://doi.org/10.1016/j.trpro.2020.03.037) by creating Safety Performance Index (SPI) to evaluate the risk based on the attributable factors. Through the aggregation and classification of the factors, road environment condition accounts for the most detrimental cause of bus accidents. Two-lane roads, narrow road shoulders and nighttime trips are positively associated with the most risk. From the data exploration, factors e.g. using mobile phones when driving, drivers exceeding the speed limits and the low quality of tires, are identified to be hazardous.
- 
-Bus priority policy is focused by [Goh, et al. (2014)](https://doi.org/10.1016/j.aap.2013.12.002) to discover the weight it has placed on resolving bus accident issues in Melbourne. Prediction models are built with the potential factors as the inputs and the corresponding parameters. The better-performing model acknowledges bus priority as a useful approach in maintaining road safety with a reduction of 53.3% in accident frequency. Further, it reveals the tendency for accidents to occur more often as traffic volume, route length and service frequency increase. Again, it verifies the positive correlation between bus stop density and accident frequency, as found in [Truong and Currie (2019)](https://doi.org/10.1016/j.aap.2019.105270).
- 
-In short, bus stop density and route length especially highways are the common factors addressed across Australian-based articles that more attention should be given to in response to bus safety. From the different regions discussed, bus priority plays a significant role in reducing environmental inference for bus drivers. The effect of darkness varies between countries, yet is contributing towards bus accidents in Australia.
+
+Unlike countries e.g. the US and the UK, the bus operation in Malaysia has not been well managed over years with the growing accidents in the intercity. [Law, et al. (2017)](https://doi.org/10.1016/j.tranpol.2017.05.003) adopt a similar idea as [Porcu et al. (2019)](https://doi.org/10.1016/j.trpro.2020.03.037) by creating Safety Performance Index (SPI) to evaluate the risk based on the attributable factors. Through the aggregation and classification of the factors, road environment condition accounts for the most detrimental cause of bus accidents. Two-lane roads, narrow road shoulders and nighttime trips are positively associated with the most risk. From the data exploration, using mobile phones when driving, drivers exceeding the speed limits and the low quality of tires are identified to be hazardous.
+
+Bus priority policy is focused by [Goh, et al. (2014)](https://doi.org/10.1016/j.aap.2013.12.002) to discover the weight it has placed on resolving accidents in Melbourne. Prediction models are built with the potential factors as the inputs and the corresponding parameters. The better-performing model acknowledges bus priority as a useful approach in maintaining road safety with a reduction of 53.3% in accident frequency. Further, it reveals the tendency for accidents to occur more often as traffic volume, route length and service frequency increase. Again, it verifies the positive correlation between bus stop density and accident frequency, as found in [Truong and Currie (2019)](https://doi.org/10.1016/j.aap.2019.105270).
+
+In brief, bus stop density and route length especially highways are the common factors addressed across Australian-based articles that require more attention in response to bus safety. From the different regions discussed, bus priority plays a significant role in reducing environmental inference for bus drivers. The effect of darkness varies between countries, yet is contributing towards bus accidents in Australia.
+
 
 # Data
 
-The data used in this report are all obtained from Transdev listed as follows:
+The data used in this report are obtained from Transdev, listed as follows:
 
 * Driver_Info.csv
 * Incidents.csv
@@ -117,14 +120,13 @@ The data used in this report are all obtained from Transdev listed as follows:
 * NSWshifts
 * sydneyweather_20150101_20210415
 
-`Driver_Info.csv` consists of the personal information with employment records for drivers across Melbourne, New South Wales (NSW), Queensland and Western Australia (WA). It is the main source for the analysis of drivers' characteristics with its inclusion of variables, e.g. `Depot`, `Gender`, `Age` and `Tenure`. When modeling for testing the significance, they are treated as the explanatory variables individually.
+`Driver_Info.csv` consists of the personal information with employment records for drivers across Melbourne, New South Wales (NSW), Queensland and Western Australia (WA). It is the main source for analysing drivers’ characteristics with its inclusion of variables, `Depot`, `Gender`, `Age` and `Tenure`. When modeling for significance testing, they are treated as the explanatory variables individually.
 
-`Incidents.csv` records every incident across NSW, Melbourne and WA. It is the most widely used data set throughout the entire analysis. Observations are narrowed down to those in which the `ClaimCategoryName` include "MVA" and "motor" so the majority of outputs align with our analysis interest - MVA incidents. For the three interactive plots, incidents are classified according to their severity (see appendix).
-`Incidents.csv` often joins with other data sets by building connections with relevant variables, e.g. depot, shift times, weather and more, to assess to what extent the variables are correlated. Incidents are often converted into a binomial form, e.g. whether an incident occurred on a specified hour, thus being regarded as the response variable.
+`Incidents.csv` records every incident across NSW, Melbourne and WA. It is the most widely used data set throughout the entire analysis. Observations are narrowed down to those in which the `ClaimCategoryName` include “MVA” and “motor” so the majority of outputs align with our analysis interest - MVA incidents. For the three interactive plots, incidents are classified according to their severity (see appendix). `Incidents.csv` often joins with other data sets by forming connections with relevant variables, such as depot, shift times and weather, to assess to what extent the variables are correlated. Incidents are often converted into a binomial form, e.g. whether an incident occurred on a specified hour, thus being regarded as the response variable.
 
-`melbourneweather_20150101_20210428.csv` and `sydneyweather_20150101_20210415`are the weather-based data for Melbourne and Sydney. The hourly measured precipitation (mm) and temperature (°C) form the key for the weather. Despite being positioned as the response variable for statistical tests in section 4, it is not interpreted as whether the occurrence of incidents determines the rainfall. Rather, it summarises the association between rainfall and incidents.
+`melbourneweather_20150101_20210428.csv` and `sydneyweather_20150101_20210415` are the weather-based data for Melbourne and Sydney. The hourly measured precipitation (mm) and temperature (°C) form the key for the weather. Despite being positioned as the response variable for statistical tests in section 4, it is not interpreted as whether the occurrence of incidents determines the rainfall. Rather, it summarises the association between rainfall and incidents.
 
-`NSWshifts.csv` contains the bus shift information for Sydney. 30 minutes of buffer time is added before and after the shift starting and ending times as some incidents occurred just right before or after the shifts. Every shift is recorded as soon as the trip starts and ends, so a lot of shifts are noted with very short timeframes. Therefore, we aggregate the shift starting and ending times daily for each driver for clearer analyses. The starting and ending times are very useful for the random forest. Drivers' driving hour is derived by joining with `Incidents.csv` to examine drivers' workload regarding the probability of incidents. 
+`NSWshifts.csv` contains the bus shift information for Sydney. 30 minutes buffer time is added before and after the shift starting and ending times as some incidents occurred just right before or after the shifts. A lot of shifts are noted with very short timeframes. Therefore, we aggregate the shift starting and ending times daily for each driver for clearer analyses. The starting and ending times are very useful for the random forest. Drivers’ driving hour is derived by joining with `Incidents.csv` to examine drivers’ workload regarding the probability of incidents.
 
 ```{r include=FALSE}
 driver_info <- read_csv("data/Driver_Info.csv") %>%
@@ -249,16 +251,16 @@ drvr_inc_dpt_mva %>%
   scale_y_continuous(labels = scales::percent_format(scale = 1)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(y = "Drivers had claims", fill = "Company", title = "Proportion of drivers had MVA claims by Depot")
+  labs(y = "Drivers had claims", fill = "Company", title = "Proportion of Drivers Had MVA Claims by Depot")
 
 
 ```
 
 All drivers are first grouped according to their corresponding depots. The proportion is calculated by the number of drivers that have MVA incidents divided by total drivers in each depot.
 
-Out of 23 depots, only 4 don't have an incident. Drivers of depots located in NSW and Melbourne have recorded more than half the MVA accidents. For NSW, Revesby and Taren Point are the depots with most drivers exposed to risks. Despite that NSW has the most depots with incidents, drivers with depots in Melbourne are involved with the most incidents. Doncaster, North-Fitzroy, South Granville and Thomastown are noted with the most danger. 
+Out of 23 depots, only 4 don't have an incident. Drivers of depots located in NSW and Melbourne have recorded more than half the MVA accidents. Revesby and Taren Point in NSW are the depots with the highest driver incident rates. Despite that NSW has the most depots with incidents, drivers with depots in Melbourne are involved with the most incidents. Doncaster, North-Fitzroy, Sunshine West and Thomastown are noted with the most danger. 
 
-The discrepancy exists between states, the drivers with depots in WA have much lower incidents, compared with NSW and Melbourne. This may lie in the differences in population. Even though a very small portion of drivers in WA involved had incidents, still, 75% of drivers in Joondalup depot have encountered MVA incidents.
+The discrepancy exists between states, the driver incident rates for depots in WA are much lower, compared with NSW and Melbourne. This may lie in the population differences. Even though a very small portion of drivers in WA had incidents, still, 75% of drivers in Joondalup depot have encountered MVA incidents.
 
 ```{r echo=FALSE, message=FALSE}
 severity_inc <- incidents %>%
@@ -297,7 +299,7 @@ svr_dpt %>%
   add_trace(y = ~serious, name = ~serious_label, type='bar',width = 0.3) %>%
   add_trace(y = ~slight, name = ~slight_label, type='bar', width=0.3,opacity=0.5) %>%
   layout(
-    title = "Proportion of drivers had MVA claims by Depot and Severity",
+    title = "Proportion of Drivers Had MVA Claims by Depot and Severity",
     yaxis = list(title = "Drivers had claims (%)",
                  range=c(0,100)),
     updatemenus = list(
@@ -320,7 +322,7 @@ svr_dpt %>%
   )
 ```
 
-The results for serious incidents are pretty close to that for the MVAs with a smaller scale. When narrowing down to slight incidents, only a few depots in Melbourne and one in WA appear. Again, over half of the drivers of Revesby and Taren Point depots had slight incidents. The comparison with the previous graph implies that the majority of MVA incidents drivers encountered in depots in NSW and WA are serious.
+To evaluate the relationship between the accident severity in different depots and the driver incident rates, we divided them into “serious” and “slight” according to incident types. The results for serious incidents are pretty close to the MVAs with a smaller scale. Narrowing down to slight incidents, only a few depots in NSW and one in WA appear. Again, the driver incident rates for Revesby and Taren Point depots had exceeded 50% for slight incidents. The comparison with the previous graph implies that the majority of MVA incidents drivers encountered in Melbourne and WA depots are serious.
 
 ## Gender
 
@@ -354,11 +356,11 @@ drvr_inc_gdr_mva %>%
   theme_minimal() +
   facet_grid(.~CompanyID) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(y = "Drivers had claims", fill = "Gender", title = "Proportion of drivers had claims by Gender and company")
+  labs(y = "Drivers had claims", fill = "Gender", title = "Proportion of Drivers Had Claims by Gender and Company")
   
 ```
 
-The absence number for Queensland is due to the lack of data in the data set. Gender differences exist in the data. In NSW and Melbourne, drivers' gender ratio is around 10 to 15 males per female, while it is approximately 6 in WA. Although more male drivers had MVA incidents than females in the three states, the numbers are only of slight differences. The ratio of MVA incidents between genders is nearly 1:1. In short, the proportion of female drivers having incidents is unexpectedly high.
+The absence number for Queensland is due to the lack of data in the data set. Gender differences exist in the data. In NSW and Melbourne, drivers’ gender ratio is around 10 to 15 males per female, while approximately 6 in WA. Although male drivers’ incident rates exceed the females in the three states, the numbers are only of slight differences. The ratio of MVA incidents between genders is nearly 1:1. Briefly, female drivers' incident rate is unexpectedly high.
 
 ```{r echo=FALSE, message=FALSE}
 inc_severity_gdr <- severity_inc %>%
@@ -395,7 +397,7 @@ svr_gdr %>%
     yaxis = list(title = "Drivers had claims (%)",
       range=c(0,100)
     ),
-    title = "Proportion of drivers had claims by Gender and Severity",
+    title = "Proportion of Drivers Had Claims by Gender, Company & Severity",
     updatemenus = list(
       list(
         type = "buttons",
@@ -418,7 +420,7 @@ svr_gdr %>%
 
 Classified with incident severity, the figure presents similar results to the MVAs. Both male and female drivers in NSW and males in WA contribute towards slight incidents.
 
-The proportion of male drivers having incidents is higher than females by 19%. The graphs above also suggest male drivers had been exposed to more incidents. Due to the imbalance number in drivers' gender, it could be unfair to conclude merely from the frequency distribution, t-test comes into place to determine if our assumption is based on random chance.
+Male driver’s incident rate is higher than females by 19%. The graphs above also suggest male drivers had been exposed to more incidents. Due to the imbalance number in drivers’ gender, it could be unfair to conclude merely from the frequency distribution, two-sample t-test comes into place to determine if our assumption is based on random chance.
 
 ```{r echo=FALSE, message=FALSE}
 gen_inc <- incidents %>%
@@ -445,14 +447,15 @@ gen_inc_tab <- gen_inc %>%
   mutate(across(has_incident_gdr, round, 2)) %>%
   rename(incident = Yes, `no incident` = No, total = num_of_drvr, prop = has_incident_gdr) 
 gen_inc_tab %>%
-  kable(caption = "Contingency table for gender and incident") %>%
+  kable(caption = "Contingency Table for Gender and Incident") %>%
   kable_styling()
 
 ```
 
 $H_0: \text{Gender and incidents are independent. There is no relationship between them.}$
 $H_1: \text{Gender and incidents are dependent. Male drivers are more likely to encounter incidents than females.}$
-The p-value of 0 allows us to reject the null hypothesis and confirms gender's impact on incidents. Male drivers are indeed more likely to have incidents. 
+
+The p-value of 0 allows us to reject the null hypothesis and confirms gender’s impact on incidents. Male drivers are indeed more likely to have incidents.
 
 ```{r echo=FALSE}
 test_x <- as.matrix(gen_inc_tab %>%
@@ -460,7 +463,7 @@ test_x <- as.matrix(gen_inc_tab %>%
                       select(incident, `no incident`))
 CLTest_gen <- prop.test(test_x)
 tidy(CLTest_gen) %>%
-  kable() %>%
+  kable(caption = "Two-Sample t-Test Results for Gender") %>%
   kable_styling(bootstrap_options = "striped")
 ```
 
@@ -519,10 +522,10 @@ inc_age_mva %>%
   scale_y_continuous(labels = scales::percent_format(scale = 1)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(x = "Age group", y = "Drivers had claims", fill = "Age group", title = "Proportion of drivers had MVA claims by Age")
+  labs(x = "Age group", y = "Drivers had claims", fill = "Age group", title = "Proportion of Drivers Had MVA Claims by Age")
 ```
 
-All drivers are grouped by their corresponding age group. The plot presents that of the total drivers within each age group, how many of them had been recorded with MVA incidents. Neither the youngest nor the eldest drivers are the most dangerous. The 31-40 age group has the most drivers with incident records. As the age groups go up until 51-60, the number starts reducing.
+All drivers are grouped by their corresponding age group. The plot presents that of the total drivers within each age group, the proportion of drivers having recorded MVA incidents. Neither the youngest nor the eldest drivers are the most dangerous. The 31-40 age group has the highest driver incident rate. As the age groups go up until 51-60, the number starts reducing.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 inc_severity_age <- severity_inc %>%
@@ -579,7 +582,7 @@ plot_ly(svr_age, x = ~age_group, mode='markers') %>%
   add_trace(y = ~serious, name = 'serious', type='bar', mode='markers') %>%
   add_trace(y = ~slight, name = 'slight', type='bar', mode='markers') %>%
   layout(
-    title = "Proportion of drivers had claims by Age group and Severity",
+    title = "Proportion of Drivers Had claims by Age Group and Severity",
     xaxis = list(title = "Age group"),
     yaxis = list(title = "Drivers had claims (%)",
                  range=c(0,100)),
@@ -605,7 +608,7 @@ plot_ly(svr_age, x = ~age_group, mode='markers') %>%
 
 ```
 
-The outcome for serious incidents is roughly the same as that for the MVAs, except on a lower scale. The proportion of drivers for slight incidents exhibits a left-skewed distribution, referring to the tendency towards the older age groups. The proportion grows until 61-70 as the peak, following a decline afterward. 
+The outcome for serious incidents is roughly the same as that for the MVAs, except on a lower scale. The driver incident rates for slight ones exhibit a left-skewed distribution, referring to the tendency towards the older age groups. The proportion grows until 61-70 as the peak, following a decline afterward. 
 
 
 
@@ -664,7 +667,7 @@ age_inc_tab %>%
   kable_styling()
 ```
 
-From the graphs above, it is hard to determine the association between age and incidents as neither positive or negative trend presents. ANOVA test takes the age group of 20-30 as the baseline to allow comparisons with the means of other age groups. The p-values are small, confirming the significance of the age groups and the association with incidents.
+From the graphs above, it is hard to determine the association between age and incidents as neither positive nor negative trend presents. ANOVA test takes the 20-30 age group as the baseline to allow comparisons with the means of other age groups. The p-values are small, confirming the significance of the 6 age groups and the association with incidents.
 
 ```{r echo=FALSE}
 bin_age <- incidents %>%
@@ -697,9 +700,10 @@ summary(model_fit)
 
 ## Tenure
 
-Tenure is derived from the interval between an employee's starting day and today's date in years, if the driver is currently in Transdev. For those who have quit, their tenure will be the interval between the starting and the employment termination dates.
+Tenure is derived from the interval between an employee’s starting day and today in years, if the driver is currently in Transdev. For those who have quit, their tenure is the interval between the starting and the employment termination dates.
 
-Based on the graph below, a positive trend exists that the proportion of drivers having MVA incidents grows with the increase in driving experiences. This might be misleading, when a driver takes more shifts, his or her exposure to the risks would increase. The result is not surprising that those with 41-60 years of experience had all been involved in incidents. 
+Based on the graph below, a positive trend exists, the driver incident rate grows with the increase in driving experiences. This might be misleading, when a driver takes more shifts, his or her exposure to the risks would increase. The result is not surprising that those with 41-60 years of experience had all been involved in incidents.
+
 
 ```{r echo=FALSE, message=FALSE}
 inc_ten_mva <- incidents %>%
@@ -766,12 +770,12 @@ inc_ten_mva %>%
   scale_y_continuous(labels = scales::percent_format(scale = 1)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-  labs(x = "Tenure group", y = "Drivers had claims", fill = "Tenure group", title = "Proportion of drivers had MVA claims by Tenure")
+  labs(x = "Tenure group", y = "Drivers had claims", fill = "Tenure group", title = "Proportion of Drivers Had MVA Claims by Tenure")
 
 
 ```
 
-The outcome overturns when breaking down the total employed years into yearly form, it records the specific year where a driver encounters incidents and aggregates them by years. The previous positive trend now becomes a positive-skewed distribution where the tenure and incidents appear to be negatively correlated. Most incidents are recorded within drivers' first three years of experience. Strictly speaking, the first ten years of drivers' employment holds a great portion of incidents among the entire count which is worth to be discussed.
+The outcome overturns when breaking down the total employed years into yearly form, it records the specific year where a driver encounters incidents and aggregates them by years. The previous positive trend now becomes a positively skewed distribution where the tenure and incidents appear to be negatively correlated. Most incidents are recorded within drivers’ first three years of experience. Strictly speaking, the first ten years of drivers’ employment holds a great portion of incidents among the entire count which is worth to be discussed.
 
 ```{r echo=FALSE}
 long_inc_ten <- incidents %>%
@@ -802,7 +806,7 @@ long_inc_ten %>%
   geom_histogram(binwidth = 1, fill = "skyblue", color = "grey80") +
   scale_x_continuous(breaks = round(seq(min(long_inc_ten$num_tenure), max(long_inc_ten$num_tenure), by = 5),1)) +
   theme_minimal() +
-  labs(x = "The th of year", y = "Number of Incidents", title = "Drivers' Tenure - The th year Drivers had MVA  incidents since employed")
+  labs(x = "The th of year", y = "Number of Incidents", title = "Drivers' Tenure - The th year Drivers Had MVA  Incidents since Employed")
 
 ```
 
@@ -823,7 +827,7 @@ ten_fit <-
       family = binomial(),
       data = long_inc_ten)
 
-tidy(ten_fit) %>% kable() %>% kable_styling(full_width = FALSE)
+tidy(ten_fit) %>% kable(caption = "Binomial Logistic Regression Results for Tenure") %>% kable_styling(full_width = FALSE)
 ```
 
 # 2) On what day have most incidents been found? Which hours are the peak and trough?
@@ -840,10 +844,10 @@ incidents %>%
   geom_bar(stat = "identity", fill = "skyblue") +
   geom_text(aes(label=total_cases), vjust=1.6, color="white", size=3.5)+
   theme_minimal() +
-  labs(y = "Total claim number", x = "Day", title = "Total MVA claim by day of the week")
+  labs(y = "Total claim number", x = "Day", title = "Total MVA Claim by Day of the Week")
 ```
 
-Monday is the peak with the most incidents, whereas Sunday is the trough. The number of incidents that occurred on weekdays is more even and exceeds those on weekends. This can be linked to the heavy usage of private vehicles and public transport for commuting, together resulting in the busy traffic.
+Monday is the peak with the most incidents, whereas Sunday is the trough. The number of incidents that occurred on weekdays is more even and exceeds those on weekends by half. This can be linked to the heavy usage of private vehicles and public transport for commuting, together resulting in the busy traffic.
 
 ```{r echo=FALSE, message=FALSE}
 incidents %>%
@@ -858,11 +862,11 @@ incidents %>%
   geom_line() +
   facet_wrap(~factor(day_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) +
     theme_minimal() +
-  labs(y = "Total claim number", x = "Hour", title = "Total claim by daily hours")
+  labs(y = "Total claim number", x = "Hour", title = "Total MVA Claim by Hour of the Day")
 
 ```
 
-The hourly graphs illustrate the earlier statement regarding peak hours for traffic. Peak hours, e.g. 7-8 am and 3-5 pm, are found with the most incidents on weekdays. On weekends, the peak with the most incidents is around 3 pm. The variation in incident number has been much narrower on weekends. Nevertheless, a common point between weekdays and weekends is that incidents tend to reduce in the evening. 
+The hourly graphs illustrate the earlier statement regarding peak traffic hours. 7-8 am and 3-5 pm incur the most incidents on weekdays. On weekends, the spike is around 3 pm. The variation in incident number has been much narrower on weekends. Nevertheless, a common point between weekdays and weekends is that incidents tend to reduce in the evening.
 
 # 3) Is it more dangerous for the bus to travel at night or during the daytime?
 
@@ -883,15 +887,16 @@ daynight_incidents_mva %>%
   geom_text(aes(label=total_cases), vjust=1.6, color="white", size=3.5) +
   theme_minimal() +
   theme(legend.position = "none") +
-  labs(x = "Daytime/night", y = "Total claim number", title = "Total MVA claims made during daytime and night")
+  labs(x = "Daytime/night", y = "Total claim number", title = "Total MVA Claims during Daytime and Night")
 ```
 
 The timeframe for daytime is from 5 am to before 7 pm, while the rest is nighttime. The number of incidents recorded during the daytime is roughly 9 times more than those at the night. However, this may be linked to the timetable of bus shifts.
 
 # 4) What kind of weather (temperature and precipitation) is considered safer or dangerous for bus drivers?
+
 ## Rain
 
-Light rain is defined with precipitation less than 2.5 mm ([Wikipedia, n.d.](https://en.wikipedia.org/wiki/Rain)), so is set as the baseline here to distinguish between little/no rain and rain. The hourly rainfall distributions for Melbourne and NSW are plotted with and without MVA incidents. They share a similar shape with the incident and non-incident peaks around 3 mm, which is not considered heavy rain. The downward-sloping curve for Melbourne isn't as smooth as that for NSW. For Melbourne, incidents aggregate closely with 4.5 mm of precipitation. Additionally, its tail towards the right end is slightly higher than that for NSW. This reveals that rain has more effects on incidents in Melbourne.
+Light rain is defined with precipitation less than 2.5 mm ([Wikipedia, n.d.](https://en.wikipedia.org/wiki/Rain)), so is set as the baseline to distinguish between little/no rain and rain. The hourly rainfall distributions for Melbourne and NSW are plotted with and without MVA incidents. They share similar shapes with both peaks around 3 mm, which is not considered heavy rain. The downward-sloping curve for Melbourne isn’t as smooth as NSW. For Melbourne, incidents aggregate closely with 4.5 mm of precipitation. Additionally, its tail towards the right end is slightly higher than NSW. This reveals that heavy rain has more effects on incidents in Melbourne.
 
 ```{r echo=FALSE}
 dh_mva_incidents <- incidents %>%
@@ -931,11 +936,11 @@ weather_n_incidents %>%
   theme_minimal() +
   theme(legend.title = element_blank()) +
   scale_fill_discrete(labels=c("Non-incident", "Incident")) +
-  labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under rainy condition measured by precipitation") +
+  labs(x = "Rainfall (mm)", title = "Incident and Non-Incident Distribution under Rainy Condition Measured by Precipitation") +
   expand_limits(x = -0.5)
 ```
 
-The distributions for Melbourne and NSW are approximately the same when there is little/no rain. The only difference observed is the taller peak for incidents in NSW, more incidents occurred in NSW under the condition with little/no rain.
+The distributions for Melbourne and NSW are approximately the same when there is little/no rain. The only difference observed is the taller peak for incidents in NSW, more incidents occurred in NSW under conditions with little/no rain.
 
 ```{r echo=FALSE}
 weather_n_incidents %>%
@@ -946,11 +951,11 @@ weather_n_incidents %>%
   theme_minimal() +
   theme(legend.title = element_blank()) +
   scale_fill_discrete(labels=c("Non-incident", "Incident")) +
-  labs(x = "Rainfall (mm)", title = "Incident and non-incident distribution under little/no rain condition measured by precipitation") +
+  labs(x = "Rainfall (mm)", title = "Incident and Non-Incident Distribution under Little/No Rain Condition Measured by Precipitation") +
   expand_limits(x = -0.2:2.4)
 ```
 
-The following outputs are the summary of precipitation with and without incidents, respectively. The overall distributions lean towards little/no rain for both conditions, having 0s dominate the 6 numbers. The only two differences lie in the mean and maximum. The mean rainfall is slightly higher when incidents occur, however, the maximum is lower. Since it is not reasonable to say that incidents have an impact on precipitation, rather, we discover whether an association exists between them. 
+The following outputs are the summary of precipitation with and without incidents, respectively. The overall distributions lean towards little/no rain in both cases, having 0s dominate the 6 numbers. The only two differences lie in the mean and maximum. The mean rainfall is slightly higher when incidents occur, however, the maximum is lower. It is not reasonable to say that incidents have an impact on precipitation, rather, we discover whether an association exists between them.
 
 ```{r echo=FALSE}
 # compare precipitation between has_incident=yes and has_incident=no
@@ -973,13 +978,14 @@ ggplot(rain_inc, aes(Precipitation)) +
         geom_histogram(fill = "skyblue", color = "grey60") +
         facet_wrap(~has_incident) +
         scale_x_log10() +
-  theme_minimal()
+  theme_minimal() +
+  labs(title = "Log Distribution of Non-Incidents and Incidents by Precipitation")
 ```
 
 $H_0: \text{The precipitation averages for incidents and non-incidents are the same.}$
 $H_1: \text{The precipitation averages for incidents and non-incidents differ.}$
 
-The nonparametric test resolves the non-normality issues and confirms the effect of precipitation on incidents with a small p-value. 
+The nonparametric test corrects the continuity and confirms the effect of precipitation on incidents with a small p-value. 
 
 ```{r echo=FALSE}
 wilcox.test(Precipitation ~ has_incident, data = rain_inc)
@@ -988,7 +994,7 @@ wilcox.test(Precipitation ~ has_incident, data = rain_inc)
 
 ## Temperature
 
-Similarly, the hourly measured temperature is plotted in distributions with and without the occurrence of MVA incidents. The shapes of incidents follow closely after the non-incidents for both Melbourne and NSW where incidents are positioned towards the higher temperature. The peak of incidents is 15 degrees for Melbourne, whereas it is around 20 degrees for NSW. A large portion concentrates between 10 and 25 degrees in Melbourne and 15 to 25 degrees in NSW. Although on a smaller scale, the distribution for Melbourne is relatively right-skewed, compared with NSW. This indicates the common occurrence of incidents on hotter days in Melbourne.
+Similarly, the hourly measured temperature is plotted in distributions with and without the occurrence of MVA incidents. The shapes of incidents follow closely after the non-incidents for both states where incidents are positioned towards the higher temperature. The peak of incidents is 15 degrees for Melbourne, whereas around 20 degrees for NSW. A large portion concentrates between 10 and 25 degrees in Melbourne and 15 to 25 degrees in NSW. Although on a smaller scale, the distribution for Melbourne is relatively right-skewed, compared with NSW. This indicates the common occurrence of incidents on hotter days in Melbourne.
 
 ```{r echo=FALSE}
 weather_n_incidents %>%
@@ -998,7 +1004,7 @@ weather_n_incidents %>%
   theme_minimal() +
   theme(legend.title = element_blank()) +
   scale_fill_discrete(labels=c("Non-incident", "Incident")) +
-  labs(x = "Temperature (°C)", title = "Incident and non-incident distribution measured by temperature")
+  labs(x = "Temperature (°C)", title = "Incident and Non-Incident Distribution Measured by Temperature")
 
 ```
 
@@ -1017,19 +1023,20 @@ summary(temp_inc %>%
           .$Temperature)
 ```
 
-Both temperature distributions for incidents and non-incidents seem approximately normally distributed, thus can be proceeded to t-test for significance testing.
+Both temperature distributions for incidents and non-incidents seem approximately normally distributed, thus can be proceeded to two-sample t-test for significance testing.
 
 ```{r echo=FALSE, message=FALSE}
 ggplot(temp_inc, aes(Temperature)) +
         geom_histogram(fill = "skyblue", color = "grey60") +
         facet_wrap(~has_incident) +
-  theme_minimal() 
+  theme_minimal() +
+  labs(title = "Distribution of Non-incidents and Incidents by Temperature")
 ```
 
 $H_0: \text{The temperature averages for incidents and non-incidents are equal.}$
 $H_1: \text{The temperature averages for incidents and non-incidents differ.}$
 
-The p-value obtained from this two-sample t-test is again less than the threshold. Therefore, the null hypothesis is rejected, an association indeed exists between temperature and incidents. Specifically, the "mean in group NO" and "mean in group Yes" prove the statistical difference with a higher mean value for incidents.
+The p-value from this test is again less than the threshold. Therefore, the null hypothesis is rejected, an association genuinely exists between temperature and incidents. Specifically, the “mean in group No” and “mean in group Yes” prove the statistical difference with a higher mean value for incidents.
 
 ```{r echo=FALSE}
 t.test(Temperature ~ has_incident, data = temp_inc)
@@ -1054,11 +1061,11 @@ ggplot(tmp2_when_occur, aes(x = diff_occur_start)) +
   geom_density() +
   facet_grid(~day_night) +
   theme_minimal() +
-  labs(x = "Number of hour(s) after shift start", title = "Hour(s) that claims made after drivers' driving hours in NSW")
+  labs(x = "Number of hour(s) after shift start", title = "The Hour in which Claims Made since Drivers Start Driving within the Day")
 
 ```
 
-The graph above plots the distribution of drivers' driving hours against the hour they ran into MVA incidents. The trends and patterns vary greatly from day to night time. During the daytime, a large portion of incidents occurred within the 3rd hour of driving which is the peak. Driving hours between 7 to 10 hours are also found to have accumulated many incidents. The pattern shifts to the later hours for nighttime, with the 7th driving hours as the peak. Additionally, many incidents are recorded around 12 hours of night drives.
+The graph above plots the distribution of drivers’ driving hours against the hour they ran into MVA incidents. The trends and patterns are inconsistent from day to night time. During the daytime, a large portion of incidents occurred within the first 3 hours of driving which is the peak. Driving hours between 7 to 10 are also found to have accumulated many incidents. The pattern shifts to the later hours for nighttime, with 7 to 9 hours as the peak. Additionally, many incidents are recorded around 9 hours of day drives and 12 hours of night drives.
 
 ```{r echo=FALSE, message=FALSE}
 
@@ -1121,9 +1128,9 @@ nsw_fit_df <- long_shifts_inc %>%
   
 ```
 
-Here, drivers' workload is represented by the number of hours they have been driving within a day. Drivers' shifts dataset is expanded to a longer format so that each hour of driving can be noted. Further, variables measured hourly, e.g. temperature and precipitation, are suitable to be added to this newly established data set. Although the effects of temperature and precipitation on incidents have been verified earlier, they are now compared with other variables in regards to their relative importance when modeling. Thus, a random forest is built to examine the relevance of the four features, hours of driving, the hour of the day, temperature and precipitation, to the occurrence of incidents.
+Drivers’ workload is represented by the number of hours they have been driving within a day. Drivers’ shifts dataset is expanded to a longer form so that each hour of driving can be noted. Further, variables measured hourly, e.g. temperature and precipitation, are suitable to be added to this new data set. Although the effects of temperature and precipitation on incidents have been verified earlier, they are now compared with other variables. Thus, a random forest is built to disclose the importance of the four features - hours of driving, the hour of the day, temperature and precipitation, to the occurrence of incidents.
 
-The response variable of 0 indicates that no incident was recorded during the given hour of the day and time, while 1 means the occurrence of an incident. Due to the imbalance between incidents and non-incidents which could lead to biased prediction, up-sampling is implemented to replicate data for the minority class to minimise the discrepancy in the results. 
+The response variable of 0 indicates no incident recorded during the given driving hour in the day and time, while 1 stands for the occurrence of an incident. Due to the imbalance between incidents and non-incidents which could lead to biased prediction, up-sampling is implemented to replicate data for the minority class to minimise the discrepancy in the results.
 
 ```{r echo=FALSE}
 set.seed(2021)
@@ -1151,8 +1158,6 @@ nsw_fit_ts_pred <- nsw_fit_ts %>%
   mutate(.pred = predict(nsw_fit_rf, nsw_fit_ts, type = "prob"))
 
 importance(nsw_fit_rf)
-plot_predict_interaction(nsw_fit_rf, up_train, "shift_hour_of_day", "shift_hour_for_driver")
-plot_predict_interaction(nsw_fit_rf, up_train, "Temperature", "Precipitation")
 ```
 
 Mean decrease accuracy assesses how much the model accuracy will decrease if that variable is dropped, while mean decrease Gini measures the variable importance based on Gini impurity index ([Bhalla, n.d.](https://www.listendata.com/2014/11/random-forest-with-r.html)). The outcomes are reversed for all features. Precipitation holds the greatest importance for mean decrease accuracy, yet it becomes the least important variable according to mean decrease Gini. On the opposite, temperature, albeit weighs the least for mean decrease accuracy, scores the highest importance for mean decrease Gini. The positions for the hour of the day and driver's driving hour also overturn.
@@ -1162,7 +1167,8 @@ varImpPlot(nsw_fit_rf)
 ```
 
 We focus on the interactions between variables that are presumably relevant.
-In the interaction plot for the time of the day and drivers' driving hours, some segments provide meaningful insights. The most apparent pattern that appears in the corner indicates the greater likelihood of incidents for drivers who had driven only for less than 5 hours from 5 to 10 am. In the afternoon, between 14 pm and 18 pm, drivers' who had driven for 7 hours within a day are noted with more dangers of being involved in an incident.
+
+In the interaction plot for the time of the day and drivers' driving hours, some segments provide meaningful insights. The most apparent pattern that appears in the corner indicates the greater likelihood of incidents for drivers who had driven only for less than 5 hours from 5 to 10 am. In the afternoon, between 2 pm and 6 pm, drivers' who had driven for 7 hours or more within a day are noted with more dangers of being involved in an incident.
 
 ```{r echo=FALSE}
 plot_predict_interaction(nsw_fit_rf, up_train, "shift_hour_of_day", "shift_hour_for_driver")
@@ -1176,27 +1182,39 @@ plot_predict_interaction(nsw_fit_rf, up_train, "Temperature", "Precipitation")
 
 # Discussion
 
-Of the variables investigated in this analysis, all of them are associated with the occurrence of MVA incidents. Although `depot` has not proceeded to t-test, the gaps in between depots are clearly displayed. Noteworthily, a large portion of total MVA incidents occurred in more populated states, e.g. NSW and Melbourne. This is foreseeable as much research conducted globally also acknowledges the positive correlation between population and bus accidents ([Bentama, et al., 2017](https://doi.org/10.1109/LOGISTIQUA.2017.7962885)). The unexpectedly large number of drivers having incidents in Joondalup seems odd. Due to the high number of drivers recorded with slight incidents, we assume drivers in Melbourne, especially Revesby and Taren Point, might have been driving with less care or have more exposure to hazards.
+Of the variables investigated in this analysis, all of them are associated with the occurrence of MVA incidents. Although depot has not proceeded to t-test, the gaps in between depots are displayed. Noteworthily, a large portion of total MVA incidents occurred in more populated states, NSW and Melbourne. This is foreseeable as much research conducted globally acknowledges the positive correlation between population and bus accidents ([Bentama, et al., 2017](https://doi.org/10.1109/LOGISTIQUA.2017.7962885)). The unexpectedly high driver incident rate in Joondalup seems odd. Due to the high number of drivers recorded with slight incidents, we assume drivers in NSW, especially Revesby and Taren Point, might have been driving with less care or have more exposure to hazards.
 
-Despite the t-test expects male drivers to be more likely to encounter an incident, the graphs reveal the unproportionate difference of incidents between male and female drivers. This suggests that there might be other complex factors within female drivers which have drawn to this result.
+Despite the two-sample t-test expects male drivers to be more likely to encounter an incident, the graphs reveal the unproportionate difference in incidents between male and female drivers. This suggests that there might be other complex factors within female drivers which have drawn to this result.
 
-To some extent, drivers’ age and tenure are related. An old driver is not necessarily experienced. The statement that the youngest driver group (20-30) has been driving more safely is only partially true. These drivers might have been new to Transdev with less than 10 years of experience in bus driving, which is noted with the high occurrence of incidents. We can be sure that elder drivers’ driving performance is stable with the low numbers for drivers involved in incidents and the increase in tenure. However, they should be mindful of running into slight incidents.
+To some extent, drivers’ age and tenure are related. An old driver is not necessarily experienced. The statement that the youngest driver group (20-30) has been driving more safely is only partially true. These drivers might have been new to Transdev with less than 10 years of experience in bus driving, which is noted with the high occurrence of incidents. We can be sure that elder drivers’ driving performance is stable due to the low driver incident rates with the increase in tenure. However, they should be mindful of slight incidents.
 
-Driving at night is commonly assumed with higher exposure to drink-driving, night visibility and fatigue effects ([Keall, et al., 2005](https://doi.org/10.1016/j.aap.2005.03.021.)). It is also polarised based on our findings from the literature review. Our findings claim the high risks of driving in the daytime, especially during peak traffic hours. Even drivers who had only been driving for less than 5 hours struggled to handle the busy traffic then. The possible factors mentioned above regarding nighttime driving should be considered as drivers who had already driven for 7 hours in the night are recorded with the high number of incidents.
+Driving at night is commonly assumed with higher exposure to drink-driving, night visibility and fatigue effects ([Keall, et al., 2005](https://doi.org/10.1016/j.aap.2005.03.021.)). It is also polarised based on the findings from the literature review. Our findings claim the high risks of driving in the daytime in NSW, especially during peak traffic hours. Even drivers who had only been driving for less than 5 hours struggled to handle the busy traffic then. The driving performance for more than 8 hours drives is not ideal, regardless of day or night. The possible factors mentioned above regarding nighttime driving should be considered because drivers who had already driven for 7 hours in the night are recorded with the high number of incidents.
 
-Although temperature and precipitation both have an impact on incidents, temperature’s impact is assumed to be stronger. This is observed from the summary statistics where the numbers for rainfall are all less than the rainfall standard for rain (2.5 mm). However, drivers in Melbourne have been more likely to have incidents under heavy rain and high temperature than in Sydney.
+Although temperature and precipitation both have an impact on incidents, temperature’s impact is assumed to be stronger. This is observed from the summary statistics where the majority of numbers for rainfall are all less than the standard for rain (2.5 mm). However, drivers in Melbourne have been more likely to have incidents under heavy rain and high temperature than in Sydney.
+
 
 # Recommendations
 
-* Utilise tracking technology or system to track every trip so that common driving behaviours and places associated with danger can be spotted. This is suggested for drivers based in populated states - NSW and Melbourne (Revesby and Taren Point) and Joondalup in response to the unexpectedly high number of drivers involved in incidents.
-* Request feedback from drivers at regular intervals to gather more safety-related information from the trips as traffic is a constantly changing field. Distribute the valuable information so that drivers are of greater control over the drives, thereby protecting themselves and the passengers.
-* Familiarise drivers with the potential road hazards, especially for the populated area. 
+* Utilise tracking technology or system to track every trip so that common driving behaviours and places associated with danger can be spotted. This is suggested for drivers based in populated states - NSW and Melbourne, in response to the high driver incident rates.
+
+* Request feedback from drivers at regular intervals to gather more safety-related information from the trips as traffic is a constantly changing field. Distribute the valuable information so that drivers are of better control over the drives, thereby protecting themselves and the passengers.
+
+* Familiarise drivers with the potential road hazards, especially for the populated area.
+
 * Specifically investigate drivers’ performances in Joondalup, Revesby and Taren Point depots.
+
 * Inspect the factors that influence female drivers’ driving performance, e.g. physical and mental health status, assigned routes and treatment. Discuss with them often to ensure they are capable of taking the assigned shifts.
-* Provide extra training for newly joined drivers with less than 10 years of driving experience. Avoid assigning them to routes with high exposure to hazards or peak traffic hours (7-8 am and 3-5 pm on weekdays and 3 pm on weekends) at first. Assign them to depots with no drivers recorded with incidents for practice, e.g. Pyrmont, Randwick, Capalaba and CATS Perth.
+
+* Provide extra training for newly joined drivers with less than 10 years of driving experience. Avoid assigning them to routes with high exposure to hazards or peak traffic hours (7-8 am and 3-5 pm on weekdays; 3 pm on weekends) at first. Assign them to depots with a 0% driver incident rate for training, e.g. Pyrmont, Randwick, Capalaba and CATS Perth.
+
 * Regularly check with mid-age and elder drivers to ensure they are mindful of the slight incidents.
-* Ensure drivers get enough rest prior to every night drive. Try to adjust the shift timetable so that drivers won’t be driving for over 7 hours at night. If the shift lasts longer than 5 hours, assign two drivers so that another driver can take over to avoid the fatigue effect or concentration issues. 
+
+* Arrange sufficient breaks for drivers who had driven for 5 hours in the daytime and have shifts in the afternoon. Possibly allocate another driver for the afternoon shift, rather than keeping the same person driving too long.
+
+* Ensure drivers get enough rest before every night drive. Try to adjust the shift timetable so that drivers are unlikely to drive for over 7 hours at night. If the shift lasts longer than 5 hours, assign two drivers so that the other one can take over to avoid the fatigue effect or concentration issues.
+
 * Check the vehicle condition regularly, specifically in hot days and heavy rain to ensure the drivers are in full control of the vehicles, thereby minimising the chance of being affected by these external factors.
+
 
 
 # Conclusion
@@ -1304,11 +1322,4 @@ https://doi.org/10.1016/j.aap.2019.105270
 Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686
 
 Wikipedia. (n.d.). *Rain. Wikipedia*. https://en.wikipedia.org/wiki/Rain  
-## Header Level 2
-
-Content and plots go here
-
-### Header Level 3
-
-Content and plots go here
 
